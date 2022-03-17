@@ -1,0 +1,364 @@
+body {
+	margin: 0px;
+	font-family: arial;
+}
+.container {
+	display: flex;
+	flex-direction: row;
+	height: 100vh;
+}
+.left_sidebar {
+	width: 15%;
+	background-color: #f6f7f7;
+	border-right:1px solid #c3c4c7;
+}
+.action_p {
+	font-weight: bold;
+	margin-left: 20px;
+	margin-top: 20px;
+}
+.left_sidebar_actions {
+	margin-top: 30px;
+	width: 80%;
+	margin: auto;
+	border-bottom: 1px solid #c3c4c7;
+	height: 200px;
+	padding-top: 30px;
+}
+.left_sidebar_a {
+	font-size: 18px;
+	margin-left: 30px;
+	margin-bottom: 3px;
+	margin-top: 3px;
+}
+.content {
+	width: 85%;
+	display: flex;
+	flex-direction: column;
+}
+.import_url {
+	width: 200px;
+    display: inline-block;
+    margin-left: 150px;
+}
+.content_header {
+	height: 60px;
+}
+.content_content {
+
+}
+h3 {
+	margin-left: 25px;
+}
+.tabset > input[type="radio"] {
+  position: absolute;
+  left: -200vw;
+}
+
+.tabset .tab-panel {
+  display: none;
+}
+
+.tabset > input:first-child:checked ~ .tab-panels > .tab-panel:first-child,
+.tabset > input:nth-child(3):checked ~ .tab-panels > .tab-panel:nth-child(2),
+.tabset > input:nth-child(5):checked ~ .tab-panels > .tab-panel:nth-child(3),
+.tabset > input:nth-child(7):checked ~ .tab-panels > .tab-panel:nth-child(4),
+.tabset > input:nth-child(9):checked ~ .tab-panels > .tab-panel:nth-child(5),
+.tabset > input:nth-child(11):checked ~ .tab-panels > .tab-panel:nth-child(6) {
+  display: block;
+}
+
+.tabset > label {
+  position: relative;
+  display: inline-block;
+  padding: 10px 10px 10px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.tabset > label:hover::after,
+.tabset > input:focus + label::after,
+.tabset > input:checked + label::after {
+  background: #06c;
+}
+
+.tabset > input:checked + label {
+  border-color: #ccc;
+  border-bottom: 1px solid #fff;
+  margin-bottom: -1px;
+}
+
+.tab-panel {
+  padding: 1px 20px;
+  border-top: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+}
+
+.tabset {
+  width: 100%;
+}
+h5 {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+.mediatab_filter_div {
+	height: 100px;
+	display: flex;
+	flex-direction: row;
+}
+.mediatab_select_div {
+	padding-top: 15px;
+	width: 600px;
+}
+select {
+	margin-top: 15px;
+	margin-right: 30px;
+	border: 1px solid #eeeeee;
+	padding: 4px;
+	padding-right: 10px;
+	color: #555a5e;
+	border-radius: 3px;
+	width: 128px;
+}
+.mediatab_index_div {
+	padding-top: 15px;
+	width: 300px;
+}
+.index_label {
+	font-size: 12px;
+}
+.index_input {
+	margin-top: 5px;
+	border: 1px solid #eeeeee;
+	border-radius: 3px;
+	width: 160px;
+	font-size: 16px;
+	padding: 4px;
+	padding-left: 12px;
+}
+.gallery {
+	height: 500px;
+	overflow: auto;
+	display: flex;
+	flex-wrap: wrap;
+}
+.expand_detial {
+	width: 150px; 
+	padding-top: 15px;	
+	display: inline-block;
+	float: right;
+}
+#detail_label {
+	color: #b4b9be; 
+	font-size: 13px;
+}
+#detail_btn {
+	font-size: 12px;
+	border-radius: 25px; 
+	padding-top: 2px; 
+	padding-bottom: 2px; 
+	border: none; 
+	background-color: #b4b9be; 
+	color: white;
+}
+#detail_btn:hover {
+	box-shadow: 0px 6px 10px 0px rgba(0,0,0,0.5);
+}
+.sidepanel  {
+  width: 400px;
+  position: fixed;
+  z-index: 1;
+  height: 100%;
+  top: 96px;
+  right: 0;
+  background-color: #f6f7f7;
+  overflow-x: hidden;
+  transition: 0.3s;
+  padding-top: 40px;
+  border-top: 1px solid #c3c4c7;
+  border-left: 1px solid #c3c4c7;
+}
+
+.sidepanel a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+.sidepanel a:hover {
+  color: #f1f1f1;
+}
+
+.sidepanel .closebtn {
+  position: absolute;
+  top: 0;
+  right: 20px;
+  font-size: 20px;
+}
+
+.sidepanel_header {
+	margin: 0px;
+	margin-bottom: 10px;
+	font-size: 14px;
+	color: #646970;
+	margin-left: 15px;
+}
+.sidepanel_detail {
+	width: 360px;
+	margin: auto;
+	display: flex;
+	flex-direction: row;
+	padding-bottom: 15px;
+	border-bottom: 1px solid #c3c4c7;
+}
+
+.sidepanel_detail_img {
+	width: 110px;
+	height: 110px;
+	background-size: cover;	
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-image: url("./imgs/food1.png");
+}
+
+.sidepanel_detail_info {
+	width: 150px;
+	padding-left: 5px;
+
+}
+.detail_info_input {
+	width: 150px;
+	font-size: 12px;
+	background-color: #f6f7f7;
+	border: none;
+	color: black;
+}
+.bold_input {
+	font-weight: bold;
+}
+
+.sidepanel_label {
+	font-size: 14px;
+	color: #646970;
+}
+.sidepanel_edit {
+	display: flex;
+	flex-direction: column;
+}
+.sidepanel_edit_section1 {
+	margin-top: 10px;
+	padding-left: 60px;
+}
+.sidepanel_edit_section2 {
+	padding-left: 130px;
+}
+.sidepanel_edit_section3 {
+	padding-left: 80px;
+}
+.sidepanel_edit_section4 {
+	margin-top: 10px;
+	padding-left: 57px;
+	display: flex;
+	flex-direction: row;
+}
+.sidepanel_edit_section5 {
+	margin-top: 10px;
+	padding-left: 35px;
+	display: flex;
+	flex-direction: row;
+}
+.sidepanel_edit_section6 {
+	margin-top: 5px;
+	padding-left: 48px;
+}
+.section4_div1 {
+	font-size: 14px;
+	color: #646970;
+}
+.textarea1 {
+	background-color: white;
+	border: none;
+	width: 216px;
+	margin-left: 20px;
+	height: 40px;
+	padding: 5px 10px 5px 10px;
+}
+.textarea2 {
+	height: 60px;
+}
+.sidepanel_copybtn {
+	margin-top: 10px;
+	border: 1px solid black;
+	padding: 5px;
+	color: blue;
+	width: 160px;
+	margin-left: 126px;
+	font-size: 12px;
+	border-radius: 3px;
+	background-color: #f1f1f1;
+	border: 1px solid black;
+}
+#describe_a {
+	font-size: 12px;
+	color: blue;
+	text-decoration: underline;
+	display: inline-block;
+}
+#describe_p {
+	display: inline-block;
+	font-size: 12px;
+	color: #646970;
+}
+.sidepanel_input {
+	margin-left: 15px;
+	background-color: white;
+	padding-left: 15px;
+	color: #c3c4c7;
+	border: 1px solid #f1f1f1;
+	border-radius: 4px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	width: 220px;
+}
+.sidepanel_label_p {
+	display: inline-block;
+}
+.option_header {
+	margin-left: 25px;
+	font-size: 16px;
+	color: black;
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+.option_content {
+	font-size: 12px;
+	color: #313131;
+	margin-left: 10px;
+	margin-top: 0px;
+	margin-bottom: 5px;
+}
+.sidepanel_option_section {
+	height: 30px;
+	width: 360px;
+	margin-left: 20px;
+	padding-left: 20px;
+	margin-bottom: 5px;
+}
+.sidepanel_option_section1 {
+	padding-left: 38px;
+}
+.option_label {
+	font-size: 14px;
+	color: #646970;
+}
+.option_select {
+	margin-top: 0px;
+	width: 200px;
+	margin-left: 20px;
+}
