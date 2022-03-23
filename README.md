@@ -1,2 +1,2 @@
 # MediaManager
-MediaManager made in Pure PHP, no Framework.
+MediaManager made of Pure PHP and jQuery, no Framework.
