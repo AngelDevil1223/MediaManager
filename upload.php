@@ -14,6 +14,7 @@ if ($conn->connect_error) {
 
 
 $imageData = '';
+$flag = 0;
 if (isset($_FILES['file']['name'][0])) {
     foreach ($_FILES['file']['name'] as $keys => $values) {
         $fileName = uniqid() . '_' . $_FILES['file']['name'][$keys];
@@ -29,8 +30,10 @@ if (isset($_FILES['file']['name'][0])) {
 			$dimension = $image_width. "-" . $image_height;
 			$cur_time = date('d-m-y h:i:s');
             $sql = "INSERT INTO uploads (filename, updatedname, fileurl, dimension , filesize , uploadtime)	VALUES ('".$realname."', '".$fileName."', '".$fileurl."', '".$dimension."' , '".$filesize."', '".$cur_time."')";
-			if (mysqli_query($conn, $sql))
-			  $imageData .= '<div style="background-image:url(uploads/' . $fileName . '); background-position: center;  background-repeat: no-repeat; background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 20px; height: 20px; top: 80px; left: 80px;" src="tick.png" /></div>';
+			if (mysqli_query($conn, $sql)) {
+			  // $imageData .= '<div style="background-image:url(uploads/' . $fileName . '); opacity: 0.4; background-position: center;  background-repeat: no-repeat; background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 30px; height: 30px; top: 33px; left: 33px;" src="load.gif" /></div>';
+				$imageData .= $fileName.",";
+			}
 			else 
 			  $imageData .= '<div class="thumbnail">Failed</div>';
         }
