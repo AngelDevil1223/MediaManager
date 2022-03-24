@@ -1,6 +1,3 @@
-<?php 
-
-?>
 
 <html lang="en-US" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
   <head>
@@ -244,46 +241,24 @@
           <input type="file" class="d-none" id="selectfile" multiple />
         </div>
         <div class="content_body" id="tab2">
-          <div class="loading d-none"><img src="load.gif" alt="" /></div>
-          <div id="ddArea">
-            Drag and Drop Files Here or
-            <a class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-              Select File(s)
-            </a>
-          </div>
-          <div id="showThumb"></div>
-          <input type="file" class="d-none" id="selectfile" multiple />
+          <h3>From URL</h3>
         </div>
         <div class="content_body" id="tab3">
-          <div class="loading d-none"><img src="load.gif" alt="" /></div>
-          <div id="ddArea">
-            Drag and Drop Files Here or
-            <a class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-              Select File(s)
-            </a>
-          </div>
-          <div id="showThumb"></div>
-          <input type="file" class="d-none" id="selectfile" multiple />
+          <h3>From Embed </h3>
         </div>
         <div class="content_body" id="tab4">
-          <div class="loading d-none"><img src="load.gif" alt="" /></div>
-          <div id="ddArea">
-            Drag and Drop Files Here or
-            <a class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-              Select File(s)
-            </a>
-          </div>
-          <div id="showThumb"></div>
-          <input type="file" class="d-none" id="selectfile" multiple />
         </div>    
       </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <script>
+      var url;
+      var embed1 = [];
+      var totallegnth;
       $(document).ready(function() {
         $("#ddArea").on("dragover", function() {
-          $(this).addClass("drag_over");
+          // $(this).addClass("drag_over");
           return false;
         });
 
@@ -321,9 +296,9 @@
         }
 
         function uploadFormData(form_data) {
-          $(".loading")
-            .removeClass("d-none")
-            .addClass("d-block");
+          // $(".loading")
+          //   .removeClass("d-none")
+          //   .addClass("d-block");
           $.ajax({
             url: "upload.php",
             method: "POST",
@@ -335,15 +310,40 @@
               $(".loading")
                 .removeClass("d-block")
                 .addClass("d-none");
+                data = data.split(",");
+                totallegnth = data.length;
+                // data = data.slice(2,data.lastIndexOf(']')-1);
+                for(var j = 0 ; j < data.length - 1 ; j++) {
+                  url = data[j];
+                  var embed = '<div id="data'+j+'" style="background-image:url(uploads/' + data[j] + '); opacity: 0.7; background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="load.gif" /><button style="position: absolute; background-image: url(cancel.png); color: white; background-position: center; background-size: cover;  background-repeat: no-repeat; width: 30px; height:30px; font-size: 8px; top: 33px; left: 33px;"></button></div>';
 
-              $("#showThumb").append(data);
+                  embed1[j] = '<div style="background-image:url(uploads/' + data[j] + '); opacity: 1; background-position: center;  background-repeat: no-repeat; background-size: cover; position: relative; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.4);" class="thumbnail"><img style="position: absolute; width: 30px; height: 30px; top: 33px; left: 33px;" src="tick.png" /></div>';
+                  $("#showThumb").append(embed);
+                  setTimeout(function(){
+                    fix()
+                  }, 1000);
+              }
             }
           });
         }
       });
-
+      function fix() {
+        for(var k = 0 ; k < totallegnth - 1; k++) {
+          document.getElementById("data"+k).remove();
+          $("#showThumb").append(embed1[k]);
+        }
+      }
       function tab(flag) {
-       // alert(flag);
+        var i = 1;
+        for(i = 1 ; i < 5 ; i ++) {
+          var element = document.getElementById("a" + i);
+          element.classList.remove("active");
+        }
+        document.getElementById("a"+flag).classList.add("active");
+        for(i = 1 ; i < 5 ; i++) {
+          document.getElementById("tab"+i).setAttribute("style", "display: none;");
+        }
+        document.getElementById("tab"+flag).setAttribute("style", "display: block;");
       }
     </script>
   </body>
