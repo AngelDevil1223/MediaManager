@@ -1,4 +1,21 @@
+<?php
 
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "medialibrary";
+
+// Create connection
+$conn = mysqli_connect($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+
+$sql = "SELECT * FROM uploads";
+$result = mysqli_query($conn , $sql);
+
+?>
 <html lang="en-US" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
   <head>
     <meta charset="UTF-8" />
@@ -81,7 +98,6 @@
         display: block;
       }
 
-      /* Absolute Center Spinner */
       .loading {
         position: fixed;
         z-index: 999;
@@ -95,7 +111,6 @@
         right: 0;
       }
 
-      /* Transparent Overlay */
       .loading:before {
         content: "";
         display: block;
@@ -205,6 +220,190 @@
         margin-left: 50px;
         cursor: pointer;
       }
+      .gallery {
+        width: 150vh;
+        margin: auto;
+        height: 65vh;
+        overflow: auto;
+      }
+      .sidenav {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 170px;
+        right: 20px;
+        background-color: #f6f7f7;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0px 6px 6px 0px rgba(0,0,0,0.3);
+      }
+
+      .sidenav a {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #818181;
+        display: block;
+        transition: 0.3s;
+      }
+
+      .sidenav a:hover {
+        color: #f1f1f1;
+      }
+
+      .sidenav .closebtn {
+        position: absolute;
+        top: 0;
+        right: 25px;
+        font-size: 30px;
+        margin-left: 50px;
+        padding-right: 0px;
+        padding-top: 0px;
+      }
+      .imagedetail {
+        border: none;
+        width: 410px;
+        margin-left: 20px;
+        display: flex;
+        flex-direction: row;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #cccccc;
+        margin-bottom: 10px;
+      }
+      .imageinfo {
+        display: flex;
+        flex-direction: column;
+        border-bottom: 1px solid #cccccc;
+        width: 410px;
+        margin-left: 20px;
+      }
+      .curimage {
+        width: 100px;
+        height: 100px;
+        margin-left: 30px;
+      }
+      .curimageinput {
+        width: 220px;
+        background-color: #f6f7f7;
+        font-size: 14px;
+        color: #818181;
+        padding-left: 20px;
+      }
+      .curimageinfos {
+        width: 250px;
+      }
+      .infoLabel {
+        color: #75797f;
+        font-size: 14px;
+      }
+      .infoInput {
+        color: #75797f;
+        background-color: white;
+        border: 1px solid #cccccc;
+        border-radius: 4px;
+        width: 280px;
+        float: right;
+        padding-left: 10px;
+      }
+      .boldInput {
+        font-weight: bold;
+      }
+      .alterDiv {
+        width: 390px;
+        float: right;
+        margin-left: 20px;
+        margin-bottom: 10px;
+      }
+      strong {
+        font-size: 12px;
+        font-weight: normal;
+        text-decoration: underline;
+        color: lightblue;
+        cursor: pointer;
+      }
+      strong:hover {
+        color: blue;
+      }
+      .linkDiv {
+        width: 290px;
+        margin-left: 130px;
+      }
+      .linkDivp {
+        font-size: 12px;
+      }
+      .infosection {
+        margin-bottom: 10px;
+      }
+      .urlInput {
+        background-color: #f6f7f7;
+        font-size: 12px;
+      }
+      .titleDiv {
+        width: 320px;
+        margin-left: 90px;
+      }
+      .captionDiv {
+        width: 340px;
+        margin-left: 70px;
+      }
+      .desDiv {
+        width: 360px;
+        margin-left: 50px;
+      }
+      .urlDiv {
+        width: 340px;
+        margin-left: 70px;
+      }
+      .linkSidebar {
+        width: 400px;
+        margin-left: 20px;
+      }
+      .sidebarLink {
+        color: lightblue !important;
+        font-size: 12px !important;
+        display: inline-block !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+        cursor: pointer;
+      }
+      .sidebarLink:hover {
+        color: blue !important;
+      }
+      .redLink {
+        color: orange !important;
+      }
+      .redLink:hover {
+        color: red !important;
+      }
+      .btnDiv {
+        width: 200px;
+        margin-left: 130px;
+      }
+      .clipboardBtn {
+        width: 200px;
+        border: 1px solid lightblue;
+        color: lightblue;
+        padding: 5px;
+        font-size: 12px;
+        border-radius: 5px;
+        transition: 0.5s;
+        cursor: pointer;
+      }
+      .clipboardBtn:hover {
+        border: 1px solid white;
+        box-shadow: 0px 3px 3px 0px rgba(0, 0, 0, 0.2);
+        color: blue;
+      }
+      #selecta {
+        cursor: pointer;
+      }
+      @media screen and (max-height: 450px) {
+        .sidenav {padding-top: 15px;}
+        .sidenav a {font-size: 18px;}
     </style>
 
     <div class="media_container">
@@ -220,9 +419,9 @@
         <h5>Manage all the media on your site, including images, video, and more</h5>
         <div class="content_nav">
           <div class="topnav" id="myTopnav">
-            <a class="active" id="a1" onclick="tab(1)">Drag and Drop</a>
-            <a id="a2" onclick="tab(2)">From URL</a>
-            <a id="a3" onclick="tab(3)">From embed</a>
+            <a class="active" id="a1" onclick="tab(1)">Upload Files</a>
+            <a id="a2" onclick="tab(2)">Insert from URL</a>
+            <a id="a3" onclick="tab(3)">Insert embed</a>
             <a id="a4" onclick="tab(4)">Media Library</a>
             <a href="javascript:void(0);" class="icon" onclick="myFunction()">
               <i class="fa fa-bars"></i>
@@ -233,7 +432,7 @@
           <div class="loading d-none"><img src="load.gif" alt="" /></div>
           <div id="ddArea">
             Drag and Drop Files Here or
-            <a class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+            <a id="selecta" class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
               Select File(s)
             </a>
           </div>
@@ -247,6 +446,67 @@
           <h3>From Embed </h3>
         </div>
         <div class="content_body" id="tab4">
+          <div class="gallery" id="gallery">
+            <?php
+                while($data = mysqli_fetch_assoc($result)) {
+               echo "<div id='".$data['fileurl']."' style='display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(".$data['fileurl']."); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;'></div>" ;
+             } ?>
+          </div>
+          <div id="mySidenav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <div class="imagedetail">
+              <div class="curimage" id="curimage">
+              </div>
+              <div class="curimageinfos">
+                <input class="curimageinput boldInput" id="curimagename" />
+                <input class="curimageinput" id="curimagetime" />
+                <input class="curimageinput" id="curimagetype" />
+                <input class="curimageinput" id="curimagesize" />
+                <input class="curimageinput" id="curimagedimension" />
+              </div>
+            </div>
+            <div class="imageinfo">
+              <div class="infosection alterDiv">
+                <label class="infoLabel">
+                  Alternative Text
+                </label>
+                <input class="infoInput" />
+              </div>
+              <div class="infosection linkDiv">
+                <p class="linkDivp"><strong>Learn how to describe the purpose of the image.</strong><br /> Leave empty if the image is purely decorative.</p>
+              </div>
+              <div class="infosection titleDiv">
+                <label class="infoLabel">
+                  Title
+                </label>
+                <input class="infoInput" />
+              </div>
+              <div class="infosection captionDiv">
+                <label class="infoLabel">
+                  Caption
+                </label>
+                <textarea class="infoInput"></textarea>
+              </div>
+              <div class="infosection desDiv">
+                <label class="infoLabel">
+                  Description
+                </label>
+                <textarea class="infoInput" ></textarea>
+              </div>
+              <div class="infosection urlDiv">
+                <label class="infoLabel">
+                  File URL:
+                </label>
+                <input class="infoInput urlInput" disabled id="curimageurl"/>
+              </div>
+              <div class="infosection btnDiv">
+                <button class="clipboardBtn">Copy URL to clipboard</button>
+              </div>
+            </div>
+            <div class="linkSidebar">
+              <a class="sidebarLink">View attachment page</a> | <a class="sidebarLink">Edit more details</a> | <a class="sidebarLink redLink">Delete permanently</a>
+            </div>
+          </div>
         </div>    
       </div>
     </div>
@@ -282,6 +542,54 @@
           uploadFormData(formData);
         });
 
+        var prediv;
+        var clickflag = 0;
+
+          $("#gallery").on('click', function(e) {
+              if(e.target.id == "gallery")
+                return;
+              if(clickflag == 0) {
+                document.getElementById(e.target.id).style.boxShadow = " 0px 8px 8px 0px rgba(255, 0, 0, 0.7)";
+                prediv = e.target.id;
+                clickflag++;
+              }
+              else {
+                document.getElementById(prediv).style.boxShadow = "0px 6px 6px 0px rgba(0, 0, 0, 0.3)";
+                document.getElementById(e.target.id).style.boxShadow = "0px 8px 8px 0px rgba(255, 0, 0, 0.7)";
+                prediv = e.target.id;
+              }
+              document.getElementById("mySidenav").style.width = "450px";
+
+            $.post('getData.php',{ id:e.target.id },
+               function(response){
+                 var response = JSON.parse(response);
+                 $("#curimagename").val(response.filename);
+                 var time = response.uploadtime;
+                 var month = Number(time.slice(3, 5));
+                 var months = ['January','Feburary','March', 'April', 'May', 'June', 'July' , 'August', 'September', 'Octorber', 'November', 'December'];
+                 month = months[month];
+                 var day = Number(time.slice(0, 2));
+                 var year = "20" + Number(time.slice(6, 8));
+                 time = month + " " + day + " " + year + " " + response.uploadtime.slice(9);
+                 $("#curimagetime").val(time);
+                 var exp = response.filename.slice(-3);
+                 if(exp == "png" || exp == "jpg" || exp == "jpeg")
+                  $("#curimagetype").val("image / " + exp);
+                 else 
+                  $("#curimagetype").val("File / " + exp);
+                 $("#curimagesize").val(response.filesize);
+                 var dimension = response.dimension.split("-");
+                 dimension = dimension[0] + " by " + dimension[1] + " pixels";
+                 $("#curimagedimension").val(dimension);
+                 $("#curimageurl").val(response.fileurl);
+                //alert(response.filename + response.fileurl + response.dimension + response.filesize + response.uploadtime);
+                 $("#curimage").css({"background-image": "url('"+response.fileurl + "')" , "background-position": "center" , "background-repeat": "no-repeat" , "background-size": "cover"});
+               }
+
+            );
+
+          })
+
         function file_explorer() {
           document.getElementById("selectfile").click();
           document.getElementById("selectfile").onchange = function() {
@@ -316,7 +624,9 @@
                 for(var j = 0 ; j < data.length - 1 ; j++) {
                   url = data[j];
                   var embed = '<div id="data'+j+'" style="background-image:url(uploads/' + data[j] + '); opacity: 0.7; background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="load.gif" /><button style="position: absolute; background-image: url(cancel.png); color: white; background-position: center; background-size: cover;  background-repeat: no-repeat; width: 30px; height:30px; font-size: 8px; top: 33px; left: 33px;"></button></div>';
-
+                  var uploadedurl = "http://localhost/uploads/" + data[j];
+                  $("#gallery").append('<div id="'+uploadedurl+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(uploads/' + data[j] + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>');
+                  // $("#gallery").append('<h2>asdf</h2>');
                   embed1[j] = '<div style="background-image:url(uploads/' + data[j] + '); opacity: 1; background-position: center;  background-repeat: no-repeat; background-size: cover; position: relative; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.4);" class="thumbnail"><img style="position: absolute; width: 30px; height: 30px; top: 33px; left: 33px;" src="tick.png" /></div>';
                   $("#showThumb").append(embed);
                   setTimeout(function(){
@@ -344,6 +654,10 @@
           document.getElementById("tab"+i).setAttribute("style", "display: none;");
         }
         document.getElementById("tab"+flag).setAttribute("style", "display: block;");
+      }
+      
+      function closeNav() {
+        document.getElementById("mySidenav").style.width = "0px"; 
       }
     </script>
   </body>
