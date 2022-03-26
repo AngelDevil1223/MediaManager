@@ -12,7 +12,7 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "SELECT * FROM uploads";
+$sql = "SELECT * FROM uploads order by id desc";
 $result = mysqli_query($conn , $sql);
 
 ?>
@@ -24,6 +24,10 @@ $result = mysqli_query($conn , $sql);
 
     <link rel="canonical" href="https://www.phplift.net/" />
     <link rel="publisher" href="https://plus.google.com/104843303742341697879" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
+
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="article" />
     <meta property="og:title" content="Drag and drop multiple file upload using jQuery, Ajax, and PHP" />
@@ -221,31 +225,31 @@ $result = mysqli_query($conn , $sql);
         cursor: pointer;
       }
       .gallery {
-        width: 150vh;
+        width: 1000px;
         margin: auto;
-        height: 65vh;
-        overflow: auto;
+        height: 440px;
+        overflow: hidden;
       }
       .sidenav {
         height: 100%;
         width: 0;
         position: fixed;
         z-index: 1;
-        top: 170px;
+        top: 150px;
         right: 20px;
         background-color: #f6f7f7;
-        overflow-x: hidden;
+        overflow: auto;
         transition: 0.5s;
-        padding-top: 60px;
+        padding-top: 10px;
         display: flex;
         flex-direction: column;
         box-shadow: 0px 6px 6px 0px rgba(0,0,0,0.3);
       }
 
       .sidenav a {
-        padding: 8px 8px 8px 32px;
+        /*padding: 8px 8px 8px 32px;*/
         text-decoration: none;
-        font-size: 25px;
+        font-size: 30px;
         color: #818181;
         display: block;
         transition: 0.3s;
@@ -255,14 +259,13 @@ $result = mysqli_query($conn , $sql);
         color: #f1f1f1;
       }
 
-      .sidenav .closebtn {
-        position: absolute;
-        top: 0;
-        right: 25px;
-        font-size: 30px;
-        margin-left: 50px;
-        padding-right: 0px;
-        padding-top: 0px;
+      .closebtn {
+        top: 0 !important;
+        right: 25px !important;
+        font-size: 25px !important;
+        width: 20px !important;
+        height: 20px !important;
+        display: inline-block !important;
       }
       .imagedetail {
         border: none;
@@ -292,6 +295,7 @@ $result = mysqli_query($conn , $sql);
         font-size: 14px;
         color: #818181;
         padding-left: 20px;
+        border: none;
       }
       .curimageinfos {
         width: 250px;
@@ -305,7 +309,7 @@ $result = mysqli_query($conn , $sql);
         background-color: white;
         border: 1px solid #cccccc;
         border-radius: 4px;
-        width: 280px;
+        width: 277px;
         float: right;
         padding-left: 10px;
       }
@@ -401,6 +405,63 @@ $result = mysqli_query($conn , $sql);
       #selecta {
         cursor: pointer;
       }
+      .multiDesp {
+        position: absolute;
+        font-size: 20px;
+        width: 300px;
+        margin: auto;
+        top: 230px;
+        left: 50%;
+      }
+      #showThumb {
+        width: 1000px;
+      }
+      .loadMore {
+        display: block;
+        background-color: white;
+        padding: 10px;
+        width: 200px;
+        color: #aaaaaa;
+        border: 1px solid #dddddd;
+        border-radius: 3px;
+        margin: auto;
+        margin-top: 20px;
+      }
+      .loadMore:hover {
+        color: #777777;
+        background-color: white;
+        box-shadow: 0px 3px 3px 0px rgba(0, 0, 0, 0.3);
+      }
+      #zipResult {
+        width: 900px;
+        margin: auto;
+        height: 40vh;
+        overflow: auto;
+        margin-top: 15px;
+        padding: 10px;
+      }
+      .zipForm {
+        width: 700px;
+        background-color: white;
+        height: 150px;
+        border-radius: 5px;
+        box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.3);
+        padding: 10px;
+        margin: auto;
+      }
+      .zipP {
+        font-size: 20px;
+        width: 200px;
+        margin: auto;
+      }
+      #zip_file {
+        width: 200px;
+        margin:  auto;
+      }
+      #btn_zip {
+        float: right;
+        margin-right: 20px;
+      }
       @media screen and (max-height: 450px) {
         .sidenav {padding-top: 15px;}
         .sidenav a {font-size: 18px;}
@@ -430,20 +491,44 @@ $result = mysqli_query($conn , $sql);
         </div>
         <div class="content_body" id="tab1">
           <div class="loading d-none"><img src="load.gif" alt="" /></div>
+          <p class="multiDesp">Multiple file upload.</p>
           <div id="ddArea">
+
             Drag and Drop Files Here or
             <a id="selecta" class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
               Select File(s)
             </a>
           </div>
           <div id="showThumb"></div>
-          <input type="file" class="d-none" id="selectfile" multiple />
+          <input type="file" style="display: none;" class="d-none" id="selectfile" multiple />
         </div>
         <div class="content_body" id="tab2">
           <h3>From URL</h3>
+          
+          <div class="form-group">
+            <label>Enter Image Url</label>
+            <input type="text" name="image_url" id="image_url" class="form-control" />
+           </div>
+           <div class="form-group">
+            <input type="button" name="upload" id="upload" value="Upload" class="btn btn-info" />
+           </div>
+
+         <div class="imageurlPreview" id="imageurlPreview"> </div>
+          
         </div>
         <div class="content_body" id="tab3">
           <h3>From Embed </h3>
+          <div class="zipForm"> 
+            <form method="POST" enctype="multipart/form-data">
+              <p class="zipP">Please Select Zip File</p>
+              <br />
+              <input id="zip_file" type="file" name="zip_file"/>
+              <br />
+              <button type="button" id="btn_zip" name="btn_zip" class="btn btn-primary">Upload</button>
+            </form>
+          </div>
+          <div id="zipResult"></div>
+
         </div>
         <div class="content_body" id="tab4">
           <div class="gallery" id="gallery">
@@ -452,13 +537,14 @@ $result = mysqli_query($conn , $sql);
                echo "<div id='".$data['fileurl']."' style='display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(".$data['fileurl']."); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;'></div>" ;
              } ?>
           </div>
+          <button class="loadMore" id="loadMore">Load More</button>
           <div id="mySidenav" class="sidenav">
-            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            
             <div class="imagedetail">
               <div class="curimage" id="curimage">
               </div>
               <div class="curimageinfos">
-                <input class="curimageinput boldInput" id="curimagename" />
+                <input class="curimageinput boldInput" id="curimagename" /><a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
                 <input class="curimageinput" id="curimagetime" />
                 <input class="curimageinput" id="curimagetype" />
                 <input class="curimageinput" id="curimagesize" />
@@ -516,6 +602,7 @@ $result = mysqli_query($conn , $sql);
       var url;
       var embed1 = [];
       var totallegnth;
+      var currentpageSize = 36;
       $(document).ready(function() {
         $("#ddArea").on("dragover", function() {
           // $(this).addClass("drag_over");
@@ -542,6 +629,19 @@ $result = mysqli_query($conn , $sql);
           uploadFormData(formData);
         });
 
+        $("#loadMore").on("click", function() {
+          document.getElementById("gallery").innerHTML = "";
+          currentpageSize += currentpageSize;
+          $.post('getPage.php' , {page: currentpageSize},
+            function(data) {
+              var data = JSON.parse(data);
+              for(var j = 0 ; j < data.length ; j ++) {
+              var loadmoreDiv = '<div id="'+data[j].fileurl+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data[j].fileurl + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>';
+              $("#gallery").append(loadmoreDiv);
+              $("#gallery").css({"overflow":"auto", "width":"1020px"});
+            }
+          });
+        });
         var prediv;
         var clickflag = 0;
 
@@ -561,7 +661,7 @@ $result = mysqli_query($conn , $sql);
               document.getElementById("mySidenav").style.width = "450px";
 
             $.post('getData.php',{ id:e.target.id },
-               function(response){
+               function(response) {
                  var response = JSON.parse(response);
                  $("#curimagename").val(response.filename);
                  var time = response.uploadtime;
@@ -627,7 +727,7 @@ $result = mysqli_query($conn , $sql);
                   var uploadedurl = "http://localhost/uploads/" + data[j];
                   $("#gallery").append('<div id="'+uploadedurl+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(uploads/' + data[j] + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>');
                   // $("#gallery").append('<h2>asdf</h2>');
-                  embed1[j] = '<div style="background-image:url(uploads/' + data[j] + '); opacity: 1; background-position: center;  background-repeat: no-repeat; background-size: cover; position: relative; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.4);" class="thumbnail"><img style="position: absolute; width: 30px; height: 30px; top: 33px; left: 33px;" src="tick.png" /></div>';
+                  embed1[j] = '<div style="background-image:url(uploads/' + data[j] + '); opacity: 1; background-position: center;  background-repeat: no-repeat; background-size: cover; position: relative; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.4);" class="thumbnail"><img style="position: absolute; width: 30px; height: 30px; top: 70px; left: 70px;" src="tick.png" /></div>';
                   $("#showThumb").append(embed);
                   setTimeout(function(){
                     fix()
@@ -659,6 +759,103 @@ $result = mysqli_query($conn , $sql);
       function closeNav() {
         document.getElementById("mySidenav").style.width = "0px"; 
       }
+
+      var fromurlGlobal;
+      function fix1(flag, flag1) {
+        document.getElementById("fromurlembed").remove();
+        $("#imageurlPreview").append(flag1);
+        // $("#showThumb").append(flag);
+        $("#gallery").append(flag);
+      }
+
+      $(document).ready(function(){
+       $('#upload').click(function(){
+        var image_url = $('#image_url').val();
+        if(image_url == '')
+        {
+         alert("Please enter image url");
+         return false;
+        }
+        else
+        {
+         // $('#upload').attr("disabled", "disabled");
+         $.ajax({
+          url:"oneupload.php",
+          method:"POST",
+          data:{image_url:image_url},
+          dataType:"JSON",
+          beforeSend:function(){
+           // $('#upload').val("Processing...");
+          },
+          success:function(data)
+          {
+            $('#image_url').val('');
+            var fromurlresult = '<div id="fromurlembed" style="background-image:url(' + data.image + '); opacity: 0.7; background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="load.gif" /><button style="position: absolute; background-image: url(cancel.png); color: white; background-position: center; background-size: cover;  background-repeat: no-repeat; width: 30px; height:30px; font-size: 8px; top: 33px; left: 33px;"></button></div>';
+            fromurlGlobal = '<div id="'+data.image+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data.image + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>';
+            fromurlGlobal1 = '<div style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data.image + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>';
+            $('#imageurlPreview').append(fromurlresult);
+            setTimeout(function(){
+              fix1(fromurlGlobal, fromurlGlobal1)
+            },1000);
+          }
+         })
+        }
+       });
+      });
+
+
+      $(document).ready(function(){
+
+      var zipRealDiv = [];
+      var zipRealCnt = 0;
+      var galleryRealDiv = [];
+
+      function fix2() {
+        document.getElementById("zipResult").innerHTML = "";
+        for(var j = 0 ; j < zipRealCnt ; j++) {
+          $("#zipResult").append(zipRealDiv[j]);
+          $("#gallery").append(galleryRealDiv[j]);
+        }
+        setTimeout(function(){
+              window.location.href = "/";
+            },300);
+      }
+
+        $('#btn_zip').on('click', function(){
+          var file_data = $('#zip_file').prop('files')[0];
+          if(file_data != undefined){
+            var form_data = new FormData();
+            form_data.append('zip_file', file_data);
+            $.ajax({
+              type: 'POST',
+              url: 'extract.php',
+              contentType: false,
+              processData: false,
+              data: form_data,
+              success: function(data){
+                // $('#result').html(data);
+
+                var data = JSON.parse(data);
+                zipRealCnt = data.length;
+                for(var j = 0 ; j < data.length ; j ++) {
+                  var zipDiv = '<div style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data[j]+ '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"><img style="position: absolute; width: 30px; height: 30px; top: 33px; left: 33px;" src="load.gif" /></div>';
+
+                  zipRealDiv[j] = '<div style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data[j]+ '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"><img style="position: absolute; width: 30px; height: 30px; top: 70px; left: 70px;" src="tick.png" /></div>'
+
+                  galleryRealDiv[j] = '<div id="' + data[j] + '" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data[j]+ '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>' 
+
+                  $("#zipResult").append(zipDiv);
+                }
+                setTimeout(function(){
+                  fix2()
+                }, 1000);
+              }
+            });
+          }
+          return false;
+        });
+      });
+
     </script>
   </body>
 </html>
