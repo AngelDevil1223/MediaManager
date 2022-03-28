@@ -52,7 +52,7 @@ if ($conn->connect_error) {
 						$image_width = $image_info[0];
 						$image_height = $image_info[1];
 						$dimension = $image_width. "-" . $image_height;
-						$sql = "INSERT INTO uploads (filename, updatedname, fileurl, dimension , filesize , uploadtime) VALUES ('".$filename."', '".$updatedname."', '".$fileurl."', '".$dimension."' , '".$filesize."', '".$cur_time."')";
+						$sql = "INSERT INTO uploads (filename, updatedname, fileurl, dimension , filesize , uploadtime , alttext , caption , description , title ) VALUES ('".$filename."', '".$updatedname."', '".$fileurl."', '".$dimension."' , '".$filesize."', '".$cur_time."', '' , '' , '' , '')";
   						$result = mysqli_query($conn , $sql);
  						$i ++ ;
 						// $output .= "<br />".$new_file."<center><img src='upload/".$name."/".$new_file."' height='50px' width='50px'/></center>";
