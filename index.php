@@ -131,6 +131,7 @@ $result = mysqli_query($conn , $sql);
         height: 100vh;
       }
       .media_sidebar {
+        padding-top: 50px;
         width: 250px;
         background-color: #283142;
       }
@@ -212,9 +213,9 @@ $result = mysqli_query($conn , $sql);
       .sidebar_menu_title {
         font-size: 24px;
         color: white;
-        margin-top: 50px;
+        margin-top: 2px;
         margin-left: 50px;
-        margin-bottom: 20px;
+        margin-bottom: 2px;
         cursor: pointer;
       }
       .sidebar_children {
@@ -227,7 +228,7 @@ $result = mysqli_query($conn , $sql);
       .gallery {
         width: 1000px;
         margin: auto;
-        height: 440px;
+        height: 320px;
         overflow: hidden;
       }
       .sidenav {
@@ -384,8 +385,8 @@ $result = mysqli_query($conn , $sql);
         color: red !important;
       }
       .btnDiv {
-        width: 200px;
-        margin-left: 130px;
+        width: 300px;
+        margin-left: 132px;
       }
       .clipboardBtn {
         width: 200px;
@@ -415,8 +416,9 @@ $result = mysqli_query($conn , $sql);
       }
       #showThumb {
         width: 1000px;
-        height: 220px;
+        height: 320px;
         overflow: auto;
+        margin: auto;
       }
       .loadMore {
         display: block;
@@ -524,20 +526,101 @@ $result = mysqli_query($conn , $sql);
         float: right;
         margin-right: 30px;
       }
+      .sidebarSavebtn {
+        width: 60px;
+        border: 1px solid pink;
+        color: pink;
+        margin-left: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+      .sidebarSavebtn:hover {
+        color: red;
+        border: 1px solid pink;
+      }
+      .sidenav1 {
+        height: 45px;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 30px;
+        right: -30px;
+        background-color: #283142;
+        box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.3);
+        border-radius: 15px 2px 2px 15px;
+        transition: 0.3s;
+        padding: 10px;
+        color: white;
+        text-align: center;
+        font-size: 18px;
+      }
+      .searchDiv {
+        width: 100%;
+        margin: auto;
+        margin-top: 10px;
+        height: 50px;
+        background-color: white;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: row;
+      }
+      .select {
+        background-color: white;
+        color: #283142;
+        height: 30px;
+        border-radius: 5px;
+        border: 1px solid #cccccc;
+        margin: 10px;
+        margin-left: 20px;
+        padding-right: 20px;
+      }
+      .select:hover {
+        box-shadow: 0px 3px 3px 0px rgba(0,0, 0, 0.1);
+        cursor: pointer;
+      }
+      .searchinputDiv {
+        flex: auto;
+      }
+      .searchFloatDiv {
+        width: 280px;
+        float: right;
+        margin-top: 12px;
+      }
+      .searchLabel {
+        font-weight: normal;
+      }
+      .searchInput {
+        border: 1px solid #aaaaaa;
+        font-size: 16px;
+        width: 200px;
+        border-radius: 3px;
+        margin-left: 10px;
+        padding: 2px;
+        padding-left: 6px;
+        box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
+      }
       @media screen and (max-height: 450px) {
         .sidenav {padding-top: 15px;}
         .sidenav a {font-size: 18px;}
+
+
     </style>
 
     <div class="media_container">
       <div class="media_sidebar">
+        <p class="sidebar_menu_title">Products</p>
+        <p class="sidebar_menu_title">Webpage</p>
+        <p class="sidebar_menu_title">Site</p>
         <p class="sidebar_menu_title">Categories</p>
-        <a class="sidebar_children">Add category</a>
-        <a class="sidebar_children">Home</a>
-        <a class="sidebar_children">Products</a>
-        <a class="sidebar_children">Banners</a>  
+        <p class="sidebar_menu_title">Currency</p>  
       </div>
       <div class="media_content">
+        <div id="mySidenav1" class="sidenav1">
+          Save Successfully!
+        </div>
+
         <h3 class="content_title"> Media </h3>
         <h5>Manage all the media on your site, including images, video, and more</h5>
         <div class="content_nav">
@@ -566,17 +649,10 @@ $result = mysqli_query($conn , $sql);
         </div>
         <div class="content_body" id="tab2">
           <div class="insertUrlCntdiv">
+            <label class="insertUrlCntlabel">Insert Number</label>
             <textarea class="insertUrlCntinput" id="insertUrlCntinput" type="text" name=""></textarea>
             <button class="insertUrlCntbtn" id="insertUrlCntbtn" > OK </button>
           </div>
-          <!-- <div class="form-group">
-            <label>Enter Image Url</label>
-            <input type="text" name="image_url" id="image_url" class="form-control" />
-          </div>
-          <div class="form-group">
-            <input type="button" name="upload" id="upload" value="Upload" class="btn btn-info" />
-          </div> -->
-
           <div class="imageurlPreview" id="imageurlPreview"> </div>
           
         </div>
@@ -595,6 +671,25 @@ $result = mysqli_query($conn , $sql);
 
         </div>
         <div class="content_body" id="tab4">
+          <div class="searchDiv">
+            <select class="select">
+              <option>All media items</option>
+              <option value="Image">Image</option>
+              <option value="Audio">Audio</option>
+              <option value="Video">Video</option>
+            </select>
+
+            <select class="select">
+              <option>All dates</option>
+            </select>
+
+            <div class="searchinputDiv">
+              <div class="searchFloatDiv">
+                <label class="searchLabel">Search </label>
+                <input class="searchInput" id="searchInput" />
+              </div>
+            </div>
+          </div>
           <div class="gallery" id="gallery">
             <?php
                 while($data = mysqli_fetch_assoc($result)) {
@@ -613,6 +708,7 @@ $result = mysqli_query($conn , $sql);
                 <input class="curimageinput" id="curimagetype" />
                 <input class="curimageinput" id="curimagesize" />
                 <input class="curimageinput" id="curimagedimension" />
+                <input style="display: none;" id="curimageUrl">
               </div>
             </div>
             <div class="imageinfo">
@@ -620,7 +716,7 @@ $result = mysqli_query($conn , $sql);
                 <label class="infoLabel">
                   Alternative Text
                 </label>
-                <input class="infoInput" />
+                <input class="infoInput" id="altText" />
               </div>
               <div class="infosection linkDiv">
                 <p class="linkDivp"><strong>Learn how to describe the purpose of the image.</strong><br /> Leave empty if the image is purely decorative.</p>
@@ -629,19 +725,19 @@ $result = mysqli_query($conn , $sql);
                 <label class="infoLabel">
                   Title
                 </label>
-                <input class="infoInput" />
+                <input class="infoInput" id="imgTitle"/>
               </div>
               <div class="infosection captionDiv">
                 <label class="infoLabel">
                   Caption
                 </label>
-                <textarea class="infoInput"></textarea>
+                <textarea class="infoInput" id="imgCaption"></textarea>
               </div>
               <div class="infosection desDiv">
                 <label class="infoLabel">
                   Description
                 </label>
-                <textarea class="infoInput" ></textarea>
+                <textarea class="infoInput" id="imgDes"></textarea>
               </div>
               <div class="infosection urlDiv">
                 <label class="infoLabel">
@@ -651,6 +747,7 @@ $result = mysqli_query($conn , $sql);
               </div>
               <div class="infosection btnDiv">
                 <button class="clipboardBtn">Copy URL to clipboard</button>
+                <button class="clipboardBtn sidebarSavebtn" id="sideimgSave"> Save </button>
               </div>
             </div>
             <div class="linkSidebar">
@@ -666,7 +763,7 @@ $result = mysqli_query($conn , $sql);
       var url;
       var embed1 = [];
       var totallegnth;
-      var currentpageSize = 36;
+      var currentpageSize = 27;
       $(document).ready(function() {
         $("#ddArea").on("dragover", function() {
           // $(this).addClass("drag_over");
@@ -745,6 +842,17 @@ $result = mysqli_query($conn , $sql);
                  dimension = dimension[0] + " by " + dimension[1] + " pixels";
                  $("#curimagedimension").val(dimension);
                  $("#curimageurl").val(response.fileurl);
+            
+                 $("#curimageUrl").val(response.fileurl);
+                 $("#altText").val(response.alttext);
+                 if(response.title == '') {
+                  $("#imgTitle").val(response.filename.slice(0,response.filename.lastIndexOf(".")));
+                 }
+                 else {
+                  $("#imgTitle").val(response.title);
+                 }
+                 $("#imgDes").val(response.description);
+                 $("#imgCaption").val(response.caption);
                 //alert(response.filename + response.fileurl + response.dimension + response.filesize + response.uploadtime);
                  $("#curimage").css({"background-image": "url('"+response.fileurl + "')" , "background-position": "center" , "background-repeat": "no-repeat" , "background-size": "cover"});
                }
@@ -941,8 +1049,66 @@ $result = mysqli_query($conn , $sql);
           $("#generateUrldiv").append('<div class="form-group"><input type="button" name="upload" id="upload" value="Upload" class="btn btn-info" /></div>');
         });
 
-      });
+        // sidebar save btn click
+        $("#sideimgSave").on("click", function() {
+          var currentImgurl = $("#curimageUrl").val();
+          var altText = $("#altText").val();
+          var imgTitle = $("#imgTitle").val();
+          var imgCaption = $("#imgCaption").val();
+          var imgDes = $("#imgDes").val();
+          
+          $.post("update.php" , {
+            url: currentImgurl,
+            altText,
+            imgTitle,
+            imgCaption,
+            imgDes,
+          }, function(data){
+            document.getElementById("mySidenav1").style.width = "300px";
+            setTimeout(function(){
+              document.getElementById("mySidenav1").style.width = "0";
+            },2000);
+          })
+        });
 
+        $("#searchInput").keyup(function() {
+          var indexWord = $("#searchInput").val();
+          if(indexWord == '')
+          {
+            document.getElementById("gallery").innerHTML = '';
+            //get all data  part 
+            $.post("getAll.php", function(data) {
+               var data = JSON.parse(data);
+                for(var j = 0 ; j < data.length ; j++) {
+                  var insertDiv = "<div id='"+data[j].fileurl+"' style='display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url("+data[j].fileurl+"); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;'></div>";
+                  $("#gallery").append(insertDiv);
+                }
+                document.getElementById("gallery").style.overflow = "hidden";
+            })
+            document.getElementById("loadMore").disabled = false;
+          }
+          else {
+            $.post("search.php" , {indexWord}, function(data) {
+              if(data.length == 11) {
+               $("#gallery").append('');
+               document.getElementById("gallery").innerHTML = '';
+               document.getElementById("loadMore").disabled = true;
+              }
+                
+              else {
+                document.getElementById("gallery").innerHTML = '';
+                var data = JSON.parse(data);
+                document.getElementById("loadMore").disabled = true;
+                for(var j = 0 ; j < data.length ; j++) {
+                  var insertDiv = "<div id='"+data[j].fileurl+"' style='display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url("+data[j].fileurl+"); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;'></div>";
+                  $("#gallery").append(insertDiv);
+                }
+              }
+            });
+          }
+        });
+
+      });
     </script>
   </body>
 </html>
