@@ -15,6 +15,9 @@ if ($conn->connect_error) {
 $sql = "SELECT * FROM uploads order by id desc";
 $result = mysqli_query($conn , $sql);
 
+$sql1 = "SELECT * FROM categories";
+$result1 = mysqli_query($conn , $sql1);
+
 ?>
 <html lang="en-US" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
   <head>
@@ -50,6 +53,9 @@ $result = mysqli_query($conn , $sql);
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css" />
     <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" />
 
+    <link rel="stylesheet" type="text/css" href="image-editor.css" />
+    <link rel="stylesheet" type="text/css" href="jquery-ui-1.8.7.custom.css"> 
+
     <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
     <script>
       (adsbygoogle = window.adsbygoogle || []).push({
@@ -57,6 +63,8 @@ $result = mysqli_query($conn , $sql);
         enable_page_level_ads: true
       });
     </script>
+      <script src="https://tutsplus.s3.amazonaws.com/tutspremium/web-development/133_canvasEditor/demo/jquery-1.4.4.min.js"></script>
+      <script src="https://tutsplus.s3.amazonaws.com/tutspremium/web-development/133_canvasEditor/demo/jquery-ui-1.8.7.custom.min.js"></script>
     <style>
       .PHPGangMessage a,
       .subbase a {
@@ -218,6 +226,11 @@ $result = mysqli_query($conn , $sql);
         margin-bottom: 2px;
         cursor: pointer;
       }
+      .sidebar_menu_title:hover {
+        font-size: 25px;
+        transition: 0.3s;
+        cursor: pointer;
+      }
       .sidebar_children {
         display: block;
         font-size: 18px;
@@ -339,6 +352,10 @@ $result = mysqli_query($conn , $sql);
       }
       .linkDivp {
         font-size: 12px;
+      }
+      .tagDiv {
+        width: 310px;
+        margin-left: 100px;
       }
       .infosection {
         margin-bottom: 10px;
@@ -601,19 +618,122 @@ $result = mysqli_query($conn , $sql);
         padding-left: 6px;
         box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
       }
-      @media screen and (max-height: 450px) {
-        .sidenav {padding-top: 15px;}
-        .sidenav a {font-size: 18px;}
 
+      .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        padding-top: 80px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0 , 0, 0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        border: none;
+      }
+
+      /* Modal Content */
+      .modal-content {
+        position: relative;
+        background-color: rgb(191 , 191,  191);
+        margin-left: 250px;
+        padding: 0;
+        border-radius: 20px 20px 15px 15px;
+        width: 1000px;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+        -webkit-animation-name: animatetop;
+        -webkit-animation-duration: 1s;
+        animation-name: animatetop;
+        animation-duration: 1s
+      }
+      /* Add Animation */
+      @-webkit-keyframes animatetop {
+        from {top:-300px; opacity:0} 
+        to {top:0; opacity:1}
+      }
+      @keyframes animatetop {
+        from {top:-300px; opacity:0}
+        to {top:0; opacity:1}
+      }
+      /* The Close Button */
+      .close {
+        color: #283142;
+        float: right;
+        font-size: 40px;
+      }
+      .close:hover,
+      .close:focus {
+        color: #283142;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .modal-header {
+        padding: 2px 16px;
+        background-color: white;
+        color: black;
+        border-bottom: 1px solid #eeeeee;
+        border-radius: 5px 5px 0px 0px;
+      }
+      .modal-body {
+        padding: 2px 16px; 
+        background-color: white;
+        height: 500px;
+        border-radius: 0px 0px 5px 5px;
+      }
+      .editImagetitle {
+        font-size: 25px;
+        color: #283142;
+        margin-top: 7px;
+        margin-left: 30px;
+      }
+      .dropdown-content {
+        display: none;
+        background-color: #283142;
+        min-width: 160px;
+        margin-left: 50px;
+      }
+      .dropdown-content a {
+        font-size: 22px;
+        margin-left: 10px;
+        color: white;
+        cursor: pointer;
+      }
+      .checkboxInput {
+        margin-left: 10px !important;
+        font-size: 20px;
+      }
+      @media screen and (max-height: 450px) 
+      {
+        .sidenav 
+        {
+          padding-top: 15px;
+        }
+        .sidenav a 
+        {
+          font-size: 18px;
+        }
+      }
 
     </style>
 
     <div class="media_container">
-      <div class="media_sidebar">
+
+
+
+      <div class="media_sidebar" id="media_sidbar">
         <p class="sidebar_menu_title">Products</p>
         <p class="sidebar_menu_title">Webpage</p>
         <p class="sidebar_menu_title">Site</p>
-        <p class="sidebar_menu_title">Categories</p>
+        <p class="sidebar_menu_title" id="categories_p">Categories</p>
+          <div class="dropdown-content" id="checkboxList">
+            <?php 
+              while ($data1 = mysqli_fetch_assoc($result1)) {
+                echo "<input type='checkbox' class='checkboxInput' value='".$data1['cate_name']."' /><a id=a>".$data1['cate_name']."</a><br />";
+              }
+            ?>
+          </div>
         <p class="sidebar_menu_title">Currency</p>  
       </div>
       <div class="media_content">
@@ -700,8 +820,9 @@ $result = mysqli_query($conn , $sql);
           <div id="mySidenav" class="sidenav">
             
             <div class="imagedetail">
-              <div class="curimage" id="curimage">
+              <div class="curimage" id="curimage" href="#openModal">
               </div>
+              <img id="curImageObject" style="display: none;" />
               <div class="curimageinfos">
                 <input class="curimageinput boldInput" id="curimagename" /><a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
                 <input class="curimageinput" id="curimagetime" />
@@ -731,7 +852,13 @@ $result = mysqli_query($conn , $sql);
                 <label class="infoLabel">
                   Caption
                 </label>
-                <textarea class="infoInput" id="imgCaption"></textarea>
+                <input class="infoInput" id="imgCaption"></input>
+              </div>
+              <div class="infosection tagDiv">
+                <label class="infoLabel">
+                  Tag
+                </label>
+                <input class="infoInput" id="imgTag"></input>
               </div>
               <div class="infosection desDiv">
                 <label class="infoLabel">
@@ -754,12 +881,40 @@ $result = mysqli_query($conn , $sql);
               <a class="sidebarLink">View attachment page</a> | <a class="sidebarLink">Edit more details</a> | <a class="sidebarLink redLink">Delete permanently</a>
             </div>
           </div>
+          <div id="myModal" class="modal">
+            <div class="modal-content">
+              <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2 class="editImagetitle"> Edit Image </h2>
+              </div>
+              <div class="modal-body">
+                <div id="imageEditor">
+                  <section id="editorContainer">
+                    <canvas id="editor" width="300px" height="300px">
+                      
+                    </canvas>
+                  </section>
+                  <section id="toolbar">
+                    <a href="#" id="save" title="Save">Save</a>
+                    <a href="#" id="rotateL" title="Rotate Left">Rotate Left</a>
+                    <a href="#" id="rotateR" title="Rotate Right">Rotate Right</a>
+                    <a href="#" id="resize" title="Resize">Resize</a>
+                  </section>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>    
       </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <script>
+
+      // checkbox tag search
+
+
       var url;
       var embed1 = [];
       var totallegnth;
@@ -842,7 +997,16 @@ $result = mysqli_query($conn , $sql);
                  dimension = dimension[0] + " by " + dimension[1] + " pixels";
                  $("#curimagedimension").val(dimension);
                  $("#curimageurl").val(response.fileurl);
-            
+                
+                 if(response.cate_name == null) {
+                  $("#imgTag").val("");
+                  document.getElementById("imgTag").disabled = false;
+                 }
+                 else {
+                  $("#imgTag").val(response.cate_name);
+                  document.getElementById("imgTag").disabled = true;
+                 }
+                
                  $("#curimageUrl").val(response.fileurl);
                  $("#altText").val(response.alttext);
                  if(response.title == '') {
@@ -855,6 +1019,7 @@ $result = mysqli_query($conn , $sql);
                  $("#imgCaption").val(response.caption);
                 //alert(response.filename + response.fileurl + response.dimension + response.filesize + response.uploadtime);
                  $("#curimage").css({"background-image": "url('"+response.fileurl + "')" , "background-position": "center" , "background-repeat": "no-repeat" , "background-size": "cover"});
+                 document.getElementById("curImageObject").src = response.fileurl;
                }
 
             );
@@ -1037,6 +1202,53 @@ $result = mysqli_query($conn , $sql);
           }
           return false;
         });
+        
+        // check multiple checkbox
+        var categories_flag = 0;
+        $("#media_sidbar").on("click", function(e) {
+
+          switch(e.target.id) {
+            case 'categories_p': 
+            {
+              if(categories_flag % 2 == 0) {
+                document.getElementById("checkboxList").setAttribute("style", "display: block;");
+                categories_flag += 1; 
+              }
+              else {
+                document.getElementById("checkboxList").setAttribute("style", "display: none;");
+                categories_flag += 1;  
+              }
+            }
+          }
+
+        });
+
+        var checkboxflag = 0;
+        $("#checkboxList").on("click", function(e) {
+          if(e.target.id == "")
+          {
+            if(e.target.checked == true) {
+              if(checkboxflag == 0) {
+                document.getElementById("gallery").innerHTML = "";
+              }
+              checkboxflag++;
+              $.post("searchtag.php", { tag:e.target.value } , function(data){
+                var data = JSON.parse(data);
+                for(var j = 0 ; j < data.length ; j++) {
+                  var insertDiv = "<div id='"+data[j].fileurl+"' class='"+e.target.value+"' style='display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url("+data[j].fileurl+"); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;'></div>";
+                  document.getElementById("gallery").innerHTML += insertDiv;
+                }
+
+              })
+            }
+            else {
+              var elements = document.getElementsByClassName(e.target.value);
+              while(elements.length > 0){
+                    elements[0].parentNode.removeChild(elements[0]);
+                }
+            }
+          }
+        })
 
         // multiple url insert function
         $("#insertUrlCntbtn").on("click", function(){
@@ -1056,18 +1268,21 @@ $result = mysqli_query($conn , $sql);
           var imgTitle = $("#imgTitle").val();
           var imgCaption = $("#imgCaption").val();
           var imgDes = $("#imgDes").val();
-          
+          var imgTag = $("#imgTag").val();
+
           $.post("update.php" , {
             url: currentImgurl,
             altText,
             imgTitle,
             imgCaption,
             imgDes,
+            imgTag,
           }, function(data){
             document.getElementById("mySidenav1").style.width = "300px";
             setTimeout(function(){
               document.getElementById("mySidenav1").style.width = "0";
             },2000);
+            document.getElementById("imgTag").disabled = true;
           })
         });
 
@@ -1108,7 +1323,66 @@ $result = mysqli_query($conn , $sql);
           }
         });
 
+        // when sidenavbar click , process image
+
+        $("#mySidenav").on("click", function(e) {
+          if(e.target.id == "curimage") {
+              var modal = document.getElementById("myModal");
+              var span = document.getElementsByClassName("close")[0];
+
+              modal.style.display = "block";
+
+              span.onclick = function() {
+                modal.style.display = "none";
+              }
+
+              window.onclick = function(event) {
+                if (event.target == modal) {
+                  modal.style.display = "none";
+                }
+              }
+
+              var editor = document.getElementById("editor"); 
+              var context = editor.getContext("2d");       
+              var Image = document.getElementById("curImageObject");
+              context.drawImage(Image, 0, 0, 300 , 300); 
+              
+              var tools = {
+                //output to <img>  
+                  save: function() { 
+                      var saveDialog = $("<div>").appendTo("body");
+                           
+                      $("<img/>", { 
+                          src: $("#curimageurl").val()
+                      }).appendTo(saveDialog);                             
+                      saveDialog.dialog({ 
+                          resizable: false, 
+                          modal: true, 
+                          title: "Right-click and choose 'Save Image As'", 
+                          width: $("#curimageurl").width + 35 
+                      }); 
+                  },
+                       
+              }
+
+              $("#toolbar").children().click(function(e) {
+                e.preventDefault();
+                tools[this.id].call(this);
+              })
+          }
+          else {
+            return;
+          }
+        })
       });
+
+    (function($){        
+    //get canvas and context 
+          
+                 
+       //more code to follow here... 
+    })(jQuery);
+
     </script>
   </body>
 </html>
