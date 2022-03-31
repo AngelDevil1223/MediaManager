@@ -688,21 +688,58 @@ $result1 = mysqli_query($conn , $sql1);
         margin-top: 7px;
         margin-left: 30px;
       }
-      .dropdown-content {
+      .dropbtn {
+        background-color: white;
+        color: black;
+        border: 1px solid #dddddd;
+        border-radius: 5px;
+        font-size: 14px;
+        padding: 4px 8px 4px 8px;
+        margin-top: 10px;
+        margin-left: 20px;
+      }
+
+      /* The container <div> - needed to position the dropdown content */
+      .dropdown {
+        position: relative;
+        display: inline-block;
+      }
+       .dropdown-content {
         display: none;
-        background-color: #283142;
-        min-width: 160px;
-        margin-left: 50px;
+        background-color: rgba(0, 0, 0, 0.5);
+        width: 130px;
+        margin-left: 20px;
+        z-index: 9999;
+        position: absolute;
       }
       .dropdown-content a {
-        font-size: 22px;
+        font-size: 16px;
         margin-left: 10px;
         color: white;
         cursor: pointer;
       }
+
+      /* Show the dropdown menu on hover */
+      .dropdown:hover .dropdown-content {display: block; z-index: 9999; }
+
+      /* Change the background color of the dropdown button when the dropdown content is shown */
+
       .checkboxInput {
         margin-left: 10px !important;
         font-size: 20px;
+      }
+      .uploadbtn {
+        padding: 5px 10px 5px 10px;
+        background-color: white;
+        color: #283142;
+        border: 1px solid #eeeeee;
+        border-radius: 5px;
+        font-size: 14px;
+        margin-right: 20px;
+        margin-bottom: 5px;
+      }
+      .uploadbtn:hover {
+        box-shadow: 0px 3px 3px 0px rgba(0, 0, 0, 0.4);
       }
       @media screen and (max-height: 450px) 
       {
@@ -727,13 +764,6 @@ $result1 = mysqli_query($conn , $sql1);
         <p class="sidebar_menu_title">Webpage</p>
         <p class="sidebar_menu_title">Site</p>
         <p class="sidebar_menu_title" id="categories_p">Categories</p>
-          <div class="dropdown-content" id="checkboxList">
-            <?php 
-              while ($data1 = mysqli_fetch_assoc($result1)) {
-                echo "<input type='checkbox' class='checkboxInput' value='".$data1['cate_name']."' /><a id=a>".$data1['cate_name']."</a><br />";
-              }
-            ?>
-          </div>
         <p class="sidebar_menu_title">Currency</p>  
       </div>
       <div class="media_content">
@@ -755,17 +785,33 @@ $result1 = mysqli_query($conn , $sql1);
           </div>
         </div>
         <div class="content_body" id="tab1">
+          <button class="uploadbtn" id="imguploadbtn">Image Upload</button>
+          <button class="uploadbtn" id="zipuploadbtn">Zip Upload</button>
           <div class="loading d-none"><img src="load.gif" alt="" /></div>
-          <p class="multiDesp">Multiple file upload.</p>
-          <div id="ddArea">
+          <div id="imauploaddiv">
+            <p class="multiDesp">Multiple file upload.</p>
+            <div id="ddArea">
 
-            Drag and Drop Files Here or
-            <a id="selecta" class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-              Select File(s)
-            </a>
+              Drag and Drop Files Here or
+              <a id="selecta" class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                Select File(s)
+              </a>
+            </div>
+            <div id="showThumb"></div>
+            <input type="file" style="display: none;" class="d-none" id="selectfile" multiple />
+          </div>  
+
+          <div class="zipForm" style="display: none;" id="zipForm"> 
+            <form method="POST" class="zipForm1" enctype="multipart/form-data">
+              <p class="zipP">Please Select Zip File</p>
+              <br />
+              <input id="zip_file" type="file" name="zip_file"/>
+              <br />
+              <button type="button" id="btn_zip" name="btn_zip" class="btn btn-primary">Upload</button>
+            </form>
           </div>
-          <div id="showThumb"></div>
-          <input type="file" style="display: none;" class="d-none" id="selectfile" multiple />
+          <div id="zipResult"></div>
+        
         </div>
         <div class="content_body" id="tab2">
           <div class="insertUrlCntdiv">
@@ -778,16 +824,7 @@ $result1 = mysqli_query($conn , $sql1);
         </div>
         <div class="content_body" id="tab3">
 
-          <div class="zipForm"> 
-            <form method="POST" class="zipForm1" enctype="multipart/form-data">
-              <p class="zipP">Please Select Zip File</p>
-              <br />
-              <input id="zip_file" type="file" name="zip_file"/>
-              <br />
-              <button type="button" id="btn_zip" name="btn_zip" class="btn btn-primary">Upload</button>
-            </form>
-          </div>
-          <div id="zipResult"></div>
+          
 
         </div>
         <div class="content_body" id="tab4">
@@ -802,6 +839,17 @@ $result1 = mysqli_query($conn , $sql1);
             <select class="select">
               <option>All dates</option>
             </select>
+
+            <div class="dropdown">
+              <button class="dropbtn">Search By Tag</button>
+              <div class="dropdown-content" id="checkboxList">
+                <?php 
+                  while ($data1 = mysqli_fetch_assoc($result1)) {
+                    echo "<input type='checkbox' class='checkboxInput' value='".$data1['cate_name']."' /><a id=a>".$data1['cate_name']."</a><br />";
+                  }
+                ?>
+              </div>
+            </div>
 
             <div class="searchinputDiv">
               <div class="searchFloatDiv">
@@ -1165,7 +1213,7 @@ $result1 = mysqli_query($conn , $sql1);
             $("#gallery").append(galleryRealDiv[j]);
           }
           setTimeout(function(){
-                window.location.href = "/";
+                // window.location.href = "/";
               },300);
         }
 
@@ -1242,10 +1290,22 @@ $result1 = mysqli_query($conn , $sql1);
               })
             }
             else {
+              checkboxflag--;
               var elements = document.getElementsByClassName(e.target.value);
               while(elements.length > 0){
                     elements[0].parentNode.removeChild(elements[0]);
                 }
+              if(checkboxflag == 0) {
+                $.post("getAll.php", function(data) {
+                  var data = JSON.parse(data);
+                  for(var j = 0 ; j < data.length ; j++) {
+                    var insertDiv = "<div id='"+data[j].fileurl+"' style='display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url("+data[j].fileurl+"); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;'></div>";
+                    $("#gallery").append(insertDiv);
+                  }
+                  document.getElementById("gallery").style.overflow = "hidden";
+                })
+                document.getElementById("loadMore").disabled = false;
+              }
             }
           }
         })
@@ -1322,6 +1382,16 @@ $result1 = mysqli_query($conn , $sql1);
             });
           }
         });
+
+        // when click imguploadbtn, zipuploadbtn click
+        $("#imguploadbtn").click(function() {
+          document.getElementById("imauploaddiv").setAttribute("style", "display: block;");
+          document.getElementById("zipForm").setAttribute("style", "display: none; ");
+        })
+        $("#zipuploadbtn").click(function() {
+          document.getElementById("imauploaddiv").setAttribute("style", "display: none;");
+          document.getElementById("zipForm").setAttribute("style", "display: block; ");  
+        })
 
         // when sidenavbar click , process image
 
