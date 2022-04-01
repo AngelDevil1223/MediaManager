@@ -72,7 +72,7 @@ $result1 = mysqli_query($conn , $sql1);
       }
     </style>
   </head>
-  <body>
+  <body id = "body">
     <style>
       body { 
         margin: 0;
@@ -741,6 +741,25 @@ $result1 = mysqli_query($conn , $sql1);
       .uploadbtn:hover {
         box-shadow: 0px 3px 3px 0px rgba(0, 0, 0, 0.4);
       }
+      .embedDiv {
+        width: 100%;
+        height: 400px;
+        border-radius: 10px;
+        border: none;
+        background-color: white;
+        box-shadow: 0px 10px 10px 0px rgba(0, 0, 0, 0.5);
+      }
+      .embedinput {
+        width: 50%;
+        height: 170px;
+        margin-top: 30px;
+        margin-left: 20px;
+        border: 1px solid #aaaaaa;
+        padding-top: 15px;
+        padding-left: 10px;
+        border-radius: 2px;
+        box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.2);
+      }
       @media screen and (max-height: 450px) 
       {
         .sidenav 
@@ -824,7 +843,9 @@ $result1 = mysqli_query($conn , $sql1);
         </div>
         <div class="content_body" id="tab3">
 
-          
+          <div class="embedDiv">
+            <textarea class="embedinput"></textarea>
+          </div>
 
         </div>
         <div class="content_body" id="tab4">
@@ -968,6 +989,11 @@ $result1 = mysqli_query($conn , $sql1);
       var totallegnth;
       var currentpageSize = 27;
       $(document).ready(function() {
+        
+        $.post("initialvisible.php" , function(data) {
+      
+        });
+
         $("#ddArea").on("dragover", function() {
           // $(this).addClass("drag_over");
           return false;
@@ -1017,7 +1043,9 @@ $result1 = mysqli_query($conn , $sql1);
                 clickflag++;
               }
               else {
-                document.getElementById(prediv).style.boxShadow = "0px 6px 6px 0px rgba(0, 0, 0, 0.3)";
+                if(prediv != null)  {
+                  document.getElementById(prediv).style.boxShadow = "0px 6px 6px 0px rgba(0, 0, 0, 0.3)";
+                }
                 document.getElementById(e.target.id).style.boxShadow = "0px 8px 8px 0px rgba(255, 0, 0, 0.7)";
                 prediv = e.target.id;
               }
@@ -1052,7 +1080,7 @@ $result1 = mysqli_query($conn , $sql1);
                  }
                  else {
                   $("#imgTag").val(response.cate_name);
-                  document.getElementById("imgTag").disabled = true;
+                  document.getElementById("imgTag").disabled = false;
                  }
                 
                  $("#curimageUrl").val(response.fileurl);
@@ -1286,10 +1314,44 @@ $result1 = mysqli_query($conn , $sql1);
                   var insertDiv = "<div id='"+data[j].fileurl+"' class='"+e.target.value+"' style='display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url("+data[j].fileurl+"); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;'></div>";
                   document.getElementById("gallery").innerHTML += insertDiv;
                 }
-
-              })
+              });
             }
             else {
+              document.getElementById("gallery").innerHTML = "";
+              var elems = document.getElementsByClassName("checkboxInput");
+              var truetag = '';
+              for(var i = 0 ; i < elems.length ; i++) {
+                  if(elems[i].checked == true) {
+                    truetag =truetag + elems[i].value + ',';
+                  }
+              }
+
+              $.post("updatetag.php" , {tag:e.target.value , truetag } , function(data) { 
+                var data = JSON.parse(data);
+                var temp = [];
+                var sameflag = 0;
+                var box = '';
+
+                for(var j = 0 ; j < data.length ; j++) {
+                  box = data[j].fileurl;
+                  for(var l = j + 1 ; l < data.length ; l++) {
+                    if(box == data[l].fileurl) {
+                      temp.push(l);
+                    }
+                  }            
+                }
+                for(var j = 0 ; j < data.length ; j ++) {
+                  for(var l = 0 ; l < temp.length ; l++) {
+                    if(data[j].fileurl == temp[l])
+                      sameflag = 1;
+                  }
+                  if(sameflag != 1) {
+                    var insertDiv = "<div id='"+data[j].fileurl+"' class='"+e.target.value+"' style='display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url("+data[j].fileurl+"); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;'></div>";
+                    document.getElementById("gallery").innerHTML += insertDiv;
+                    sameflag = 0;
+                  }
+                }  
+              });
               checkboxflag--;
               var elements = document.getElementsByClassName(e.target.value);
               while(elements.length > 0){

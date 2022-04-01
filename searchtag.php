@@ -13,7 +13,10 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 $tag = $_POST['tag'];
-$sql = "SELECT * FROM uploads WHERE cate_name =  '".$tag."'";
+
+
+
+$sql = "SELECT * FROM uploads WHERE cate_name LIKE '%".$tag."%' AND visible = 0";
 
 $echodata = [];
 $i = 0;
@@ -27,6 +30,9 @@ if (mysqli_num_rows($result) > 0) {
 } else {
   echo "0 results";
 }
+
+$sql1 = " UPDATE `uploads` SET visible = 1 WHERE cate_name LIKE '%".$tag."%'" ;
+$result1 = mysqli_query($conn , $sql1);
 
 echo json_encode($echodata);
 
