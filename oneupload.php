@@ -39,7 +39,8 @@ if(isset($_POST["image_url"]))
   $image_height = $image_info[1];
   $dimension = $image_width. "-" . $image_height;
   $cur_time = date('d-m-y h:i:s');
-  $sql = "INSERT INTO uploads (filename, updatedname, fileurl, dimension , filesize , uploadtime , alttext , caption , description , title ) VALUES ('".$realname."', '".$uploadedname."', '".$fileurl."', '".$dimension."' , '".$filesize."', '".$cur_time."' , '' , '', '', '' )";
+  $visible = 0;
+  $sql = "INSERT INTO uploads (filename, updatedname, fileurl, dimension , filesize , uploadtime , alttext , caption , description , title , visible) VALUES ('".$realname."', '".$uploadedname."', '".$fileurl."', '".$dimension."' , '".$filesize."', '".$cur_time."' , '' , '', '', '' , '".$visible."')";
   $result = mysqli_query($conn , $sql);
   $output = array(
   'message' => "sucess",
