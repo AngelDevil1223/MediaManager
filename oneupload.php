@@ -35,8 +35,15 @@ if(isset($_POST["image_url"]))
   $filesize = filesize($new_image_path);
   $filesize = round($filesize / 1024 , 2) . " KB";
 
-  $image_width = $image_info[0];
-  $image_height = $image_info[1];
+  if ($image_info != null) {
+    $image_width = $image_info[0];
+    $image_height = $image_info[1];
+  }
+  else {
+    $image_width = ' ';
+    $image_height = ' ';
+  }
+  
   $dimension = $image_width. "-" . $image_height;
   $cur_time = date('d-m-y h:i:s');
   $visible = 0;
