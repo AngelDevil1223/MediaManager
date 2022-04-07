@@ -1201,29 +1201,46 @@ $result1 = mysqli_query($conn , $sql1);
 
         // when embed btn click
         $("#embedBtn").click(()=>{
-          var embed = $("#embedValue").val();
-          var data = embed.split("src=");
-          var data1 = data[1].split(">");
-          var embedsource = data1[0].slice(1 , data1[0].length -1);
-          var embedresult , embedGlobal , embedGlobal1;
-          $.ajax({
-                  url:"oneupload.php",
-                  method:"POST",
-                  data:{image_url:embedsource},
-                  dataType:"JSON",
-                  success:function(data)
-                  {
-                    embedresult = '<div id="embedremove" style="background-image:url(' + data.image + '); opacity: 0.7; background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="load.gif" /><button style="position: absolute; background-image: url(cancel.png); color: white; background-position: center; background-size: cover;  background-repeat: no-repeat; width: 30px; height:30px; font-size: 8px; top: 33px; left: 33px;"></button></div>';
-                    embedGlobal = '<div id="'+data.image+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data.image + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>';
-                    embedGlobal1 = '<div style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data.image + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"><img src="tick.png" style="position:absolute; width:30px ; height: 30px; top: 70px; left: 70px; " /></div>';
-                    $("#embedResult").append(embedresult);
-                    
-                    setTimeout(function(){
-                      document.getElementById("embedremove").remove();
-                      $("#gallery").append(embedGlobal);
-                      $("#embedResult").append(embedGlobal1);
-                    },1000); }
-                })
+          var result = $("#embedValue").val();
+          result = result.split(/\n/);
+          var totalembedcnt = result.length;
+          var indexembed = 0;
+          const myInterval1 = setInterval(function() {
+            if(indexembed == totalembedcnt) {
+              clearInterval(myInterval1);
+            } else {
+              var embed = result[indexembed];
+              if(embed.slice(0, 8) != "<iframe " || embed.slice(-9) != "</iframe>") {
+                alert("Failed spell!");
+                return;
+              }
+              var draw = embed.split("src=");
+              var draw1 = draw[1].split(">");
+              var embedsource = draw1[0].slice(1 , draw1[0].length -1);
+              var embedresult , embedGlobal , embedGlobal1;
+              $.ajax({
+                      url:"oneupload.php",
+                      method:"POST",
+                      data:{image_url:embedsource},
+                      dataType:"JSON",
+                      success:function(data)
+                      {
+                        embedresult = '<div id="embedremove" style="background-image:url(' + data.image + '); opacity: 0.7; background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="load.gif" /><button style="position: absolute; background-image: url(cancel.png); color: white; background-position: center; background-size: cover;  background-repeat: no-repeat; width: 30px; height:30px; font-size: 8px; top: 33px; left: 33px;"></button></div>';
+                        embedGlobal = '<div id="'+data.image+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data.image + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>';
+                        embedGlobal1 = '<div style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data.image + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"><img src="tick.png" style="position:absolute; width:30px ; height: 30px; top: 70px; left: 70px; " /></div>';
+                        $("#embedResult").append(embedresult);
+                        
+                        setTimeout(function(){
+
+                          document.getElementById("embedremove").remove();
+                          $("#gallery").append(embedGlobal);
+                          $("#embedResult").append(embedGlobal1);
+                          indexembed++;
+                        },1000); 
+                      }
+                    })
+                  }
+              }, 5000);
         });
 
         var totalUrlcnt;
@@ -1235,7 +1252,7 @@ $result1 = mysqli_query($conn , $sql1);
           
             var k = 0;
             const myInterval = setInterval(function() {
-              console.log("totalUrlcnt" + totalUrlcnt + "  " + "currentindex  " + k);
+              console.log(k);
               if(k == totalUrlcnt) {
                 // window.location.href = "/";
                 clearInterval(myInterval);
@@ -1278,7 +1295,6 @@ $result1 = mysqli_query($conn , $sql1);
               }
             },2000);  
         })
-
 
         var zipRealDiv = [];
         var zipRealCnt = 0;
