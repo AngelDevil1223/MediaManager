@@ -460,6 +460,7 @@ $result1 = mysqli_query($conn , $sql1);
         overflow: auto;
         margin-top: 15px;
         padding: 10px;
+        display: none;
       }
       .zipForm {
         width: 700px;
@@ -743,22 +744,38 @@ $result1 = mysqli_query($conn , $sql1);
       }
       .embedDiv {
         width: 100%;
-        height: 400px;
+        height: 210px;
         border-radius: 10px;
         border: none;
         background-color: white;
         box-shadow: 0px 10px 10px 0px rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: row;
+      }
+      .embedResult {
+        width: 900px;
+        height: 220px;
+        overflow: auto;
+        border: none;
+        margin: auto;
+        margin-top: 20px;
       }
       .embedinput {
-        width: 50%;
+        width: 80%;
         height: 170px;
         margin-top: 30px;
         margin-left: 20px;
-        border: 1px solid #aaaaaa;
+        border: 1px solid #cccccc;
+        color: #aaaaaa;
         padding-top: 15px;
         padding-left: 10px;
-        border-radius: 2px;
-        box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        box-shadow: 0px 3px 3px 0px rgba(0, 0, 0, 0.2);
+      }
+      .embedBtn {
+        margin-top: 160px;
+        height: 40px;
+        margin-left: 30px;
       }
       @media screen and (max-height: 450px) 
       {
@@ -834,7 +851,7 @@ $result1 = mysqli_query($conn , $sql1);
         </div>
         <div class="content_body" id="tab2">
           <div class="insertUrlCntdiv">
-            <label class="insertUrlCntlabel">Insert Number</label>
+            <label class="insertUrlCntlabel">Insert</label>
             <textarea class="insertUrlCntinput" id="insertUrlCntinput" type="text" name=""></textarea>
             <button class="insertUrlCntbtn" id="insertUrlCntbtn" > OK </button>
           </div>
@@ -844,9 +861,14 @@ $result1 = mysqli_query($conn , $sql1);
         <div class="content_body" id="tab3">
 
           <div class="embedDiv">
-            <textarea class="embedinput"></textarea>
+            <textarea class="embedinput" id="embedValue"></textarea>
+            <button class="btn btn-primary embedBtn" id="embedBtn">
+              Embed
+            </button>
           </div>
-
+          <div class="embedResult" id="embedResult">
+            
+          </div>
         </div>
         <div class="content_body" id="tab4">
           <div class="searchDiv">
@@ -1176,6 +1198,34 @@ $result1 = mysqli_query($conn , $sql1);
 
       //  tab2 when click url upload button
       $(document).ready(function(){
+
+        // when embed btn click
+        $("#embedBtn").click(()=>{
+          var embed = $("#embedValue").val();
+          var data = embed.split("src=");
+          var data1 = data[1].split(">");
+          var embedsource = data1[0].slice(1 , data1[0].length -1);
+          var embedresult , embedGlobal , embedGlobal1;
+          $.ajax({
+                  url:"oneupload.php",
+                  method:"POST",
+                  data:{image_url:embedsource},
+                  dataType:"JSON",
+                  success:function(data)
+                  {
+                    embedresult = '<div id="embedremove" style="background-image:url(' + data.image + '); opacity: 0.7; background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="load.gif" /><button style="position: absolute; background-image: url(cancel.png); color: white; background-position: center; background-size: cover;  background-repeat: no-repeat; width: 30px; height:30px; font-size: 8px; top: 33px; left: 33px;"></button></div>';
+                    embedGlobal = '<div id="'+data.image+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data.image + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>';
+                    embedGlobal1 = '<div style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data.image + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"><img src="tick.png" style="position:absolute; width:30px ; height: 30px; top: 70px; left: 70px; " /></div>';
+                    $("#embedResult").append(embedresult);
+                    
+                    setTimeout(function(){
+                      document.getElementById("embedremove").remove();
+                      $("#gallery").append(embedGlobal);
+                      $("#embedResult").append(embedGlobal1);
+                    },1000); }
+                })
+        });
+
         var totalUrlcnt;
 
         $("#insertUrlCntbtn").click(function(e) {
@@ -1373,15 +1423,15 @@ $result1 = mysqli_query($conn , $sql1);
         })
 
         // multiple url insert function
-        $("#insertUrlCntbtn").on("click", function(){
-          totalUrlcnt = $("#insertUrlCntinput").val();
-          $("#insertUrlCntinput").val('');
-          for(var i = 0 ; i < totalUrlcnt ; i++)
-          {
-            $("#generateUrldiv").append('<div class="form-group"><label>Enter Image Url</label><input type="text" name="image_url" id="image_url'+i+'" class="form-control" /></div>');          
-          }
-          $("#generateUrldiv").append('<div class="form-group"><input type="button" name="upload" id="upload" value="Upload" class="btn btn-info" /></div>');
-        });
+        // $("#insertUrlCntbtn").on("click", function(){
+        //   totalUrlcnt = $("#insertUrlCntinput").val();
+        //   $("#insertUrlCntinput").val('');
+        //   for(var i = 0 ; i < totalUrlcnt ; i++)
+        //   {
+        //     $("#generateUrldiv").append('<div class="form-group"><label>Enter Image Url</label><input type="text" name="image_url" id="image_url'+i+'" class="form-control" /></div>');          
+        //   }
+        //   $("#generateUrldiv").append('<div class="form-group"><input type="button" name="upload" id="upload" value="Upload" class="btn btn-info" /></div>');
+        // });
 
         // sidebar save btn click
         $("#sideimgSave").on("click", function() {
@@ -1449,10 +1499,12 @@ $result1 = mysqli_query($conn , $sql1);
         $("#imguploadbtn").click(function() {
           document.getElementById("imauploaddiv").setAttribute("style", "display: block;");
           document.getElementById("zipForm").setAttribute("style", "display: none; ");
+          document.getElementById("zipResult").setAttribute("style", "display: none;");
         })
         $("#zipuploadbtn").click(function() {
           document.getElementById("imauploaddiv").setAttribute("style", "display: none;");
           document.getElementById("zipForm").setAttribute("style", "display: block; ");  
+          document.getElementById("zipResult").setAttribute("style", "display: block;");
         })
 
         // when sidenavbar click , process image
@@ -1491,9 +1543,129 @@ $result1 = mysqli_query($conn , $sql1);
                           resizable: false, 
                           modal: true, 
                           title: "Right-click and choose 'Save Image As'", 
-                          width: $("#curimageurl").width + 35 
+                          width: $("#curimageurl").width + 35 ,
                       }); 
                   },
+                  rotate: function(conf) { 
+                      //save current image before rotating 
+                      $("<img/>", { 
+                          src: editor.toDataURL(), 
+                          load: function() { 
+                              //rotate canvas 
+                              context.clearRect(0, 0, editor.width, editor.height); 
+                              context.translate(conf.x, conf.y); 
+                              context.rotate(conf.r); 
+                              //redraw saved image 
+                              context.drawImage(this, 0, 0);   
+                          } 
+                      }); 
+                  }, 
+                  rotateL: function() { 
+                      var conf = { 
+                          x: 0, 
+                          y: editor.height, 
+                          r: -90 * Math.PI / 180 
+                      }; 
+                      tools.rotate(conf); 
+                  }, 
+                  rotateR: function() { 
+                      var conf = { 
+                          x: editor.width, 
+                          y: 0, 
+                          r: 90 * Math.PI / 180 
+                      }; 
+                      tools.rotate(conf); 
+                  },
+                  resize: function() { 
+                  //create resizable over canvas 
+                  var coords = $(editor).offset(), 
+                      resizer = $("<div>", { 
+                          id: "resizer"
+                      }).css({ 
+                          position: "absolute", 
+                          left: coords.left, 
+                          top: coords.top, 
+                          width: editor.width - 1, 
+                          height: editor.height - 1 
+                      }).appendTo("body"); 
+                
+                      var resizeWidth = null, 
+                          resizeHeight = null, 
+                          xpos = editor.offsetLeft + 5, 
+                          ypos = editor.offsetTop + 5; 
+                            
+                      resizer.resizable({ 
+                          aspectRatio: true, 
+                          maxWidth: editor.width - 1, 
+                          maxHeight: editor.height - 1, 
+                            
+                          resize: function(e, ui) { 
+                              resizeWidth = Math.round(ui.size.width); 
+                              resizeHeight = Math.round(ui.size.height); 
+                            
+                              //tooltip to show new size 
+                              var string = "New width: " + resizeWidth + "px,<br />new height: " + resizeHeight + "px"; 
+                                
+                              if ($("#tip").length) { 
+                                  $("#tip").html(string); 
+                              } else { 
+                                  var tip = $("<p></p>", { 
+                                      id: "tip", 
+                                      html: string 
+                                  }).css({ 
+                                      left: xpos, 
+                                      top: ypos 
+                                  }).appendTo("body"); 
+                              } 
+                          }, 
+                          stop: function(e, ui) { 
+                            
+                              //confirm resize, then do it 
+                              var confirmDialog = $("<div></div>", { 
+                                  html: "Image will be resized to " + resizeWidth + "px wide, and " + resizeHeight + "px high.<br />Proceed?"
+                              });              
+                                                
+                              //init confirm dialog 
+                              confirmDialog.dialog({ 
+                                  resizable: false, 
+                                  modal: true, 
+                                  title: "Confirm resize?", 
+                                  buttons: { 
+                                      Cancel: function() { 
+                                        
+                                          //tidy up 
+                                          $(this).dialog("close"); 
+                                          resizer.remove(); 
+                                          $("#tip").remove(); 
+                                      }, 
+                                  Yes: function() { 
+                                    
+                                      //tidy up 
+                                      $(this).dialog("close"); 
+                                      resizer.remove(); 
+                                      $("#tip").remove();                          
+                                        
+                                      $("<img/>", { 
+                                          src: editor.toDataURL(), 
+                                          load: function() {                           
+                
+                                              //remove old image 
+                                              context.clearRect(0, 0, editor.width, editor.height); 
+                                                
+                                              //resize canvas 
+                                              editor.width = resizeWidth; 
+                                              editor.height = resizeHeight; 
+                                                
+                                              //redraw saved image 
+                                              context.drawImage(this, 0, 0, resizeWidth, resizeHeight);    
+                                          } 
+                                      }); 
+                                  } 
+                              } 
+                          }); 
+                      } 
+                  }); 
+              },
                        
               }
 
