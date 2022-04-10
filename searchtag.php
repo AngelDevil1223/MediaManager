@@ -1,21 +1,8 @@
 <?php
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "medialibrary";
+include 'config.php';
 
-// Create connection
-$conn = mysqli_connect($servername, $username, $password, $dbname);
-// Check connection
-
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
-}
 $tag = $_POST['tag'];
-
-
-
 $sql = "SELECT * FROM uploads WHERE cate_name LIKE '%".$tag."%' AND visible = 0";
 
 $echodata = [];
