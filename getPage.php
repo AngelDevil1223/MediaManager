@@ -1,16 +1,7 @@
 <?php
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "medialibrary";
-$echodata = [];
-// Create connection
-$conn = mysqli_connect($servername, $username, $password, $dbname);
-// Check connection
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
-}
+include 'config.php';
+
 $pageSize = $_POST['page'];
 $i = 0;
 $result = mysqli_query($conn,"SELECT * FROM uploads ORDER BY id DESC LIMIT ".$pageSize);
