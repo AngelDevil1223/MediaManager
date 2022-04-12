@@ -14,9 +14,14 @@ include 'config.php';
 		        $filesize = $_FILES['file']['size'][$keys];
 		        $filesize = round($filesize / 1024 , 2) . " KB";
 		        $image_info = getimagesize($fileurl);
-				$image_width = $image_info[0];
-				$image_height = $image_info[1];
-				$dimension = $image_width. "-" . $image_height;
+		        if($image_info != null) {
+					$image_width = $image_info[0];
+					$image_height = $image_info[1];
+					$dimension = $image_width. "-" . $image_height;
+				}
+				else {
+					$dimension = "none";
+				}
 				$cur_time = date('d-m-y h:i:s');
 				$visible = 0;
 	            $sql = "INSERT INTO uploads (filename, updatedname, fileurl, dimension , filesize , uploadtime , alttext, caption, description , title , visible)	VALUES ('".$realname."', '".$fileName."', '".$fileurl."', '".$dimension."' , '".$filesize."', '".$cur_time."' , '', '' , '' ,'' , '".$visible."')";
@@ -258,7 +263,8 @@ include 'config.php';
 		$sql = "UPDATE uploads SET visible = 0 ";
 		$result = mysqli_query($conn , $sql);
 
-		echo "success";
+		
+
 	}
 
 	// when click loadmore btn
@@ -294,5 +300,144 @@ include 'config.php';
 		}
 
 		echo json_encode($echodata10);
+	}
+
+	// when delete btn click
+	if(isset($_POST['delete'])) {
+		$url = $_POST['id'];
+		$sql = "DELETE FROM `uploads` WHERE fileurl='".$url."'";
+		if ($conn->query($sql) === TRUE) {
+		  echo "Record deleted successfully";
+		  return;
+		}
+	}
+
+	// when change media type drop down list
+	if(isset($_POST['mediaType'])) {
+		$type = $_POST['mediaType'];
+		$filter = '';
+		switch ($type) {
+			case 'All media items':
+				$filter = 'SELECT * FROM `uploads` WHERE filename LIKE "%%"';
+				break;
+			
+			case 'Image':
+				$filter = 'SELECT * FROM `uploads` WHERE filename LIKE "%.jpg%" or filename LIKE "%.png%" or filename LIKE "%.jpeg%"';
+				break;
+
+			case 'Audio':
+				$filter = 'SELECT * FROM `uploads` WHERE filename LIKE "%.mp3%" ';
+				break;
+
+			case 'Video':
+				$filter = 'SELECT * FROM `uploads` WHERE filename LIKE "%.mp4%" or filename LIKE "%.avi%"';
+				break;
+		}
+
+		$i = 0;
+		$echodata10 = [];
+		$result = mysqli_query($conn,$filter);
+		if (mysqli_num_rows($result) > 0) {
+		  // output data of each row
+		  while($row = mysqli_fetch_assoc($result)) {
+		    $echodata10[$i] = $row;
+		    $i++;
+		  }
+		} else {
+		  echo "0 results";
+		}
+		echo json_encode($echodata10);
+		return ;
+	}
+
+	// get all rows when start
+	if(isset($_POST['getRow'])) {
+		$sql = "SELECT count(id) as num FROM `uploads`";
+		$result = mysqli_query($conn , $sql);
+		if (mysqli_num_rows($result) > 0) {
+		  // output data of each row
+		  while($row = mysqli_fetch_assoc($result)) {
+		    echo $row['num'];
+		  }
+		} else {
+		  echo "0 results";
+		}
+		return;
+	}
+
+	// when change startFrom date input
+	if(isset($_POST['startFrom'])) {
+		$start = strval($_POST['startFrom']);
+		$i = 0;
+		$echodata = [];
+		$string = '';
+		$sql = "SELECT * FROM uploads";
+		$result = $conn->query($sql);
+
+		if ($result->num_rows > 0) {
+		  while($row = $result->fetch_assoc()) {
+		    $string = $row["uploadtime"];
+		    $string = "20".substr($string, 6 ,2).substr($string, 3 ,2).substr($string, 0, 2);
+		    $string = strval($string);
+		    if($string >= $start) {
+		    	$echodata[$i] = $row;
+		    	$i ++;
+		    }
+		  }
+		} else {
+		  echo "0 results";
+		}
+		echo json_encode($echodata);
+	}
+
+	// when change startTo date input
+	if(isset($_POST['startTo'])) {
+		$end = strval($_POST['startTo']);
+		$i = 0;
+		$echodata = [];
+		$string = '';
+		$sql = "SELECT * FROM uploads";
+		$result = $conn->query($sql);
+
+		if ($result->num_rows > 0) {
+		  while($row = $result->fetch_assoc()) {
+		    $string = $row["uploadtime"];
+		    $string = "20".substr($string, 6 ,2).substr($string, 3 ,2).substr($string, 0, 2);
+		    $string = strval($string);
+		    if($string <= $end) {
+		    	$echodata[$i] = $row;
+		    	$i ++;
+		    }
+		  }
+		} else {
+		  echo "0 results";
+		}
+		echo json_encode($echodata);
+	}
+
+	// when change nextFrom and nextTo date input
+	if(isset($_POST['nextFrom'])) {
+		$start = strval($_POST['nextFrom']);
+		$to = strval($_POST['nextTo']);
+		$i = 0;
+		$echodata = [];
+		$string = '';
+		$sql = "SELECT * FROM uploads";
+		$result = $conn->query($sql);
+
+		if ($result->num_rows > 0) {
+		  while($row = $result->fetch_assoc()) {
+		    $string = $row["uploadtime"];
+		    $string = "20".substr($string, 6 ,2).substr($string, 3 ,2).substr($string, 0, 2);
+		    $string = strval($string);
+		    if($string >= $start && $string <= $to) {
+		    	$echodata[$i] = $row;
+		    	$i ++;
+		    }
+		  }
+		} else {
+		  echo "0 results";
+		}
+		echo json_encode($echodata);
 	}
 ?>

@@ -17,6 +17,7 @@ $result1 = mysqli_query($conn , $sql1);
 
     <link rel="canonical" href="https://www.phplift.net/" />
     <link rel="publisher" href="https://plus.google.com/104843303742341697879" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
@@ -44,9 +45,9 @@ $result1 = mysqli_query($conn , $sql1);
     <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="./assets/image-editor.css" />
-    <link rel="stylesheet" type="text/css" href="./assets/jquery-ui-1.8.7.custom.css"> 
-    <link rel="stylesheet" type="text/css" href="./assets/custom.css"> 
-    
+    <link rel="stylesheet" type="text/css" href="./assets/jquery-ui-1.8.7.custom.css" /> 
+    <link rel="stylesheet" type="text/css" href="./assets/custom.css" />
+
     <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
     <script>
       (adsbygoogle = window.adsbygoogle || []).push({
@@ -66,9 +67,6 @@ $result1 = mysqli_query($conn , $sql1);
   <body id = "body">
 
     <div class="media_container">
-
-
-
       <div class="media_sidebar" id="media_sidbar">
         <p class="sidebar_menu_title">Products</p>
         <p class="sidebar_menu_title">Webpage</p>
@@ -79,6 +77,9 @@ $result1 = mysqli_query($conn , $sql1);
       <div class="media_content">
         <div id="mySidenav1" class="sidenav1">
           Save Successfully!
+        </div>
+        <div id="mySidenav2" class="sidenav1">
+          Copy clipboard!
         </div>
 
         <h3 class="content_title"> Media </h3>
@@ -146,16 +147,27 @@ $result1 = mysqli_query($conn , $sql1);
         </div>
         <div class="content_body" id="tab4">
           <div class="searchDiv">
-            <select class="select">
+            <select class="select" id="typeMediafilter">
               <option>All media items</option>
               <option value="Image">Image</option>
               <option value="Audio">Audio</option>
               <option value="Video">Video</option>
             </select>
 
-            <select class="select">
+            <!-- <select class="select">
               <option>All dates</option>
-            </select>
+            </select> -->
+            <div class="dataRangeDiv">
+              <div class="dataRange">
+                <label>From:</label>
+                <input class="dateInput" type="date" name="" id="dateFrom" />
+              </div>
+
+              <div class="dataRange">
+                <label>To:</label>
+                <input class="dateInput" type="date" name="" id="dateTo" />
+              </div>
+            </div>
 
             <div class="dropdown">
               <button class="dropbtn">Search By Tag</button>
@@ -167,6 +179,9 @@ $result1 = mysqli_query($conn , $sql1);
                 ?>
               </div>
             </div>
+
+
+
 
             <div class="searchinputDiv">
               <div class="searchFloatDiv">
@@ -238,12 +253,12 @@ $result1 = mysqli_query($conn , $sql1);
                 <input class="infoInput urlInput" disabled id="curimageurl"/>
               </div>
               <div class="infosection btnDiv">
-                <button class="clipboardBtn">Copy URL to clipboard</button>
+                <button class="clipboardBtn" id="copyurlbtn">Copy URL to clipboard</button>
                 <button class="clipboardBtn sidebarSavebtn" id="sideimgSave"> Save </button>
               </div>
             </div>
             <div class="linkSidebar">
-              <a class="sidebarLink">View attachment page</a> | <a class="sidebarLink">Edit more details</a> | <a class="sidebarLink redLink">Delete permanently</a>
+              <a class="sidebarLink">View attachment page</a> | <a class="sidebarLink" id="editImage">Edit more details</a> | <a class="sidebarLink redLink" id="deleteImg">Delete permanently</a>
             </div>
           </div>
           <div id="myModal" class="modal">
@@ -284,10 +299,23 @@ $result1 = mysqli_query($conn , $sql1);
       var embed1 = [];
       var totallegnth;
       var currentpageSize = 27;
+      var prediv;
+      var clickflag = 0;
+      var totalUploadImageCnt = 0;
+      var dateFromflag = 0;
+      var dateToflag = 0;
+
       $(document).ready(function() {
-        
+
         $.post("upload.php" , {initial: "true"},function(data) {
-      
+        
+        });
+
+        $.post("upload.php", {getRow:"true"}, function(data) {
+            totalUploadImageCnt = data;
+            if (totalUploadImageCnt <= 27) {
+              document.getElementById("loadMore").setAttribute("style","display: none;");
+            }
         });
 
         $("#ddArea").on("dragover", function() {
@@ -314,89 +342,93 @@ $result1 = mysqli_query($conn , $sql1);
           }
           uploadFormData(formData);
         });
+
         $("#loadMore").on("click", function() {
           document.getElementById("gallery").innerHTML = "";
           currentpageSize += currentpageSize;
+          if (currentpageSize > totalUploadImageCnt) {
+            document.getElementById("loadMore").setAttribute("style", "display: none; ");
+          }
           $.post('upload.php' , {page: currentpageSize},
             function(data) {
               var data = JSON.parse(data);
               for(var j = 0 ; j < data.length ; j ++) {
               var loadmoreDiv = '<div id="'+data[j].fileurl+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data[j].fileurl + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>';
               $("#gallery").append(loadmoreDiv);
-              $("#gallery").css({"overflow":"auto", "width":"100%"});
+              $("#gallery").css({"overflow":"auto" , "width":"1020px"});
             }
           });
         });
-        var prediv;
-        var clickflag = 0;
+    
 
-          $("#gallery").on('click', function(e) {
-              if(e.target.id == "gallery")
-                return;
-              if(clickflag == 0) {
-                document.getElementById(e.target.id).style.boxShadow = " 0px 8px 8px 0px rgba(255, 0, 0, 0.7)";
-                prediv = e.target.id;
-                clickflag++;
+        $("#gallery").on('click', function(e) {
+   
+            if(e.target.id == "gallery")
+              return;
+            if(clickflag == 0) {
+              console.log(clickflag);
+              document.getElementById(e.target.id).style.boxShadow = " 0px 8px 8px 0px rgba(255, 0, 0, 0.7)";
+              prediv = e.target.id;
+              clickflag++;
+            }
+            else {
+              if(prediv != null)  {
+                 document.getElementById(prediv).style.boxShadow = "0px 6px 6px 0px rgba(0, 0, 0, 0.3)";
               }
-              else {
-                if(prediv != null)  {
-                  document.getElementById(prediv).style.boxShadow = "0px 6px 6px 0px rgba(0, 0, 0, 0.3)";
-                }
-                document.getElementById(e.target.id).style.boxShadow = "0px 8px 8px 0px rgba(255, 0, 0, 0.7)";
-                prediv = e.target.id;
-              }
-              document.getElementById("mySidenav").style.width = "450px";
+              document.getElementById(e.target.id).style.boxShadow = "0px 8px 8px 0px rgba(255, 0, 0, 0.7)";
+              prediv = e.target.id;
+            }
+            document.getElementById("mySidenav").style.width = "450px";
 
-            $.post('upload.php',{ id:e.target.id, getdata: "true" },
-               function(response) {
-                 var response = JSON.parse(response);
-                 $("#curimagename").val(response.filename);
-                 var time = response.uploadtime;
-                 var month = Number(time.slice(3, 5));
-                 var months = ['January','Feburary','March', 'April', 'May', 'June', 'July' , 'August', 'September', 'Octorber', 'November', 'December'];
-                 month = months[month];
-                 var day = Number(time.slice(0, 2));
-                 var year = "20" + Number(time.slice(6, 8));
-                 time = month + " " + day + " " + year + " " + response.uploadtime.slice(9);
-                 $("#curimagetime").val(time);
-                 var exp = response.filename.slice(-3);
-                 if(exp == "png" || exp == "jpg" || exp == "jpeg")
-                  $("#curimagetype").val("image / " + exp);
-                 else 
-                  $("#curimagetype").val("File / " + exp);
-                 $("#curimagesize").val(response.filesize);
-                 var dimension = response.dimension.split("-");
-                 dimension = dimension[0] + " by " + dimension[1] + " pixels";
-                 $("#curimagedimension").val(dimension);
-                 $("#curimageurl").val(response.fileurl);
-                
-                 if(response.cate_name == null) {
-                  $("#imgTag").val("");
-                  document.getElementById("imgTag").disabled = false;
-                 }
-                 else {
-                  $("#imgTag").val(response.cate_name);
-                  document.getElementById("imgTag").disabled = false;
-                 }
-                
-                 $("#curimageUrl").val(response.fileurl);
-                 $("#altText").val(response.alttext);
-                 if(response.title == '') {
-                  $("#imgTitle").val(response.filename.slice(0,response.filename.lastIndexOf(".")));
-                 }
-                 else {
-                  $("#imgTitle").val(response.title);
-                 }
-                 $("#imgDes").val(response.description);
-                 $("#imgCaption").val(response.caption);
-                //alert(response.filename + response.fileurl + response.dimension + response.filesize + response.uploadtime);
-                 $("#curimage").css({"background-image": "url('"+response.fileurl + "')" , "background-position": "center" , "background-repeat": "no-repeat" , "background-size": "cover"});
-                 document.getElementById("curImageObject").src = response.fileurl;
+          $.post('upload.php',{ id:e.target.id, getdata: "true" },  function(response) {
+               var response = JSON.parse(response);
+               $("#curimagename").val(response.filename);
+               var time = response.uploadtime;
+               var month = Number(time.slice(3, 5));
+               var months = ['','January','Feburary','March', 'April', 'May', 'June', 'July' , 'August', 'September', 'Octorber', 'November', 'December'];
+               month = months[month];
+               var day = Number(time.slice(0, 2));
+               var year = "20" + Number(time.slice(6, 8));
+               time = month + " " + day + " " + year + " " + response.uploadtime.slice(9);
+               $("#curimagetime").val(time);
+               var exp = response.filename.slice(-3);
+               if(exp == "png" || exp == "jpg" || exp == "jpeg")
+                $("#curimagetype").val("image / " + exp);
+               else 
+                $("#curimagetype").val("File / " + exp);
+               $("#curimagesize").val(response.filesize);
+               var dimension = response.dimension.split("-");
+               dimension = dimension[0] + " by " + dimension[1] + " pixels";
+               $("#curimagedimension").val(dimension);
+               $("#curimageurl").val(response.fileurl);
+              
+               if(response.cate_name == null) {
+                $("#imgTag").val("");
+                document.getElementById("imgTag").disabled = false;
                }
+               else {
+                $("#imgTag").val(response.cate_name);
+                document.getElementById("imgTag").disabled = false;
+               }
+              
+               $("#curimageUrl").val(response.fileurl);
+               $("#altText").val(response.alttext);
+               if(response.title == '') {
+                // $("#imgTitle").val(response.filename.slice(0,response.filename.lastIndexOf(".")));
+               }
+               else {
+                $("#imgTitle").val(response.title);
+               }
+               $("#imgDes").val(response.description);
+               $("#imgCaption").val(response.caption);
+              //alert(response.filename + response.fileurl + response.dimension + response.filesize + response.uploadtime);
+               $("#curimage").css({"background-image": "url('"+response.fileurl + "')" , "background-position": "center" , "background-repeat": "no-repeat" , "background-size": "cover"});
+               document.getElementById("curImageObject").src = response.fileurl;
+             }
 
-            );
+          );
 
-          })
+        });
 
         function file_explorer() {
           document.getElementById("selectfile").click();
@@ -428,6 +460,12 @@ $result1 = mysqli_query($conn , $sql1);
               $(".loading")
                 .removeClass("d-block")
                 .addClass("d-none");
+                $.post("upload.php", {getRow:"true"}, function(data) {
+                    totalUploadImageCnt = data;
+                    if (totalUploadImageCnt > 27) {
+                      document.getElementById("loadMore").setAttribute("style","display: block;");
+                    }
+                });
                 data = data.split(",");
                 totallegnth = data.length;
                 // data = data.slice(2,data.lastIndexOf(']')-1);
@@ -446,6 +484,66 @@ $result1 = mysqli_query($conn , $sql1);
             }
           });
         }
+
+        // DateRange calculate function
+        function DateRange(flag, value) {
+          document.getElementById("gallery").innerHTML = '';
+          if(flag == 0) {
+            if(value == "from") {
+              var startFrom = $("#dateFrom").val();
+              startFrom = Number(startFrom.replace(/\D/g, ''));
+              $.post("upload.php", {startFrom}, function(data) {
+                data = JSON.parse(data);
+                drawdate = [];
+                for(var i = 0 ; i < data.length ; i++) {
+                  document.getElementById("gallery").innerHTML += '<div id="'+data[i].fileurl+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data[i].fileurl + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>';
+                }
+              });
+            }
+            else if(value == "to") {
+              var startTo = $("#dateTo").val();
+              startTo = Number(startTo.replace(/\D/g , ''));
+              $.post("upload.php", {startTo}, function(data) {
+                data = JSON.parse(data);
+                for(var i = 0 ; i < data.length ; i++) {          
+                  document.getElementById("gallery").innerHTML += '<div id="'+data[i].fileurl+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data[i].fileurl + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>';
+                }
+              });
+            }
+          }
+          else if(flag == 1){
+            var nextFrom = $("#dateFrom").val();
+            nextFrom = Number(nextFrom.replace(/\D/g , ''));
+            var nextTo = $("#dateTo").val();
+            nextTo = Number(nextTo.replace(/\D/g , ''));
+            $.post("upload.php", { nextFrom , nextTo}, function(data) {
+              data = JSON.parse(data);
+              for(var i = 0 ; i < data.length ; i++) {
+                document.getElementById("gallery").innerHTML += '<div id="'+data[i].fileurl+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data[i].fileurl + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>';
+              }
+            });
+          }
+        }
+        // when click data range picker
+        $("#dateFrom").change(()=>{
+          if(dateFromflag == 0 || dateToflag == 0) {
+            dateFromflag = 1;
+            DateRange(0,"from");
+          }
+          else {
+            DateRange(1, " ");
+   
+          }
+        });
+        $("#dateTo").change(()=>{
+          if(dateFromflag == 0 || dateToflag == 0) {
+            DateRange(0,"to");
+            dateToflag = 1;
+          }
+          else {
+            DateRange(1, "");
+          }
+        });
       });
       function fix() {
         for(var k = 0 ; k < totallegnth - 1; k++) {
@@ -483,6 +581,12 @@ $result1 = mysqli_query($conn , $sql1);
           var indexembed = 0;
           const myInterval1 = setInterval(function() {
             if(indexembed == totalembedcnt) {
+              $.post("upload.php", {getRow:"true"}, function(data) {
+                    totalUploadImageCnt = data;
+                    if (totalUploadImageCnt > 27) {
+                      document.getElementById("loadMore").setAttribute("style","display: block;");
+                    }
+                });
               clearInterval(myInterval1);
             } else {
               var embed = result[indexembed];
@@ -513,6 +617,7 @@ $result1 = mysqli_query($conn , $sql1);
                           $("#embedResult").append(embedGlobal1);
                           indexembed++;
                         },1000); 
+
                       },
                       error: function(err) {
                          var fromurlresult = '<div id="fromurlembed" style=" opacity: 0.7; background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="./assets/load.gif" /><button style="position: absolute; background-image: url(./assets/cancel.png); color: white; background-position: center; background-size: cover;  background-repeat: no-repeat; width: 30px; height:30px; font-size: 8px; top: 33px; left: 33px;"></button></div>';
@@ -539,6 +644,12 @@ $result1 = mysqli_query($conn , $sql1);
             var k = 0;
             const myInterval = setInterval(function() {
               if(k == totalUrlcnt) {
+                $.post("upload.php", {getRow:"true"}, function(data) {
+                    totalUploadImageCnt = data;
+                    if (totalUploadImageCnt > 27) {
+                      document.getElementById("loadMore").setAttribute("style","display: block;");
+                    }
+                });
                 clearInterval(myInterval);
               }
               else {
@@ -602,6 +713,12 @@ $result1 = mysqli_query($conn , $sql1);
           setTimeout(function(){
                 // window.location.href = "/";
               },300);
+          $.post("upload.php", {getRow:"true"}, function(data) {
+                    totalUploadImageCnt = data;
+                    if (totalUploadImageCnt > 27) {
+                      document.getElementById("loadMore").setAttribute("style","display: block;");
+                    }
+                });
         }
 
         // zip file upload part in First tab named "Upload Files"
@@ -668,6 +785,7 @@ $result1 = mysqli_query($conn , $sql1);
                 document.getElementById("gallery").innerHTML = "";
               }
               checkboxflag++;
+              document.getElementById("loadMore").setAttribute("style","display : none;");
               $.post("upload.php", { tag:e.target.value , searchtag: "true" } , function(data){
                 var data = JSON.parse(data);
                 for(var j = 0 ; j < data.length ; j++) {
@@ -718,6 +836,7 @@ $result1 = mysqli_query($conn , $sql1);
                     elements[0].parentNode.removeChild(elements[0]);
                 }
               if(checkboxflag == 0) {
+               
                 $.post("upload.php", {getall: "true"}, function(data) {
                   var data = JSON.parse(data);
                   for(var j = 0 ; j < data.length ; j++) {
@@ -726,7 +845,9 @@ $result1 = mysqli_query($conn , $sql1);
                   }
                   document.getElementById("gallery").style.overflow = "hidden";
                 })
-                document.getElementById("loadMore").disabled = false;
+                if (totalUploadImageCnt > 27) {
+                  document.getElementById("loadMore").setAttribute("style","display: block;");
+                }
               }
             }
           }
@@ -742,7 +863,7 @@ $result1 = mysqli_query($conn , $sql1);
           var imgDes = $("#imgDes").val();
           var imgTag = $("#imgTag").val();
 
-          $.post("update.php" , {
+          $.post("upload.php" , {
             url: currentImgurl,
             altText,
             imgTitle,
@@ -773,20 +894,25 @@ $result1 = mysqli_query($conn , $sql1);
                 }
                 document.getElementById("gallery").style.overflow = "hidden";
             })
-            document.getElementById("loadMore").disabled = false;
+            $.post("upload.php", {getRow:"true"}, function(data) {
+                    totalUploadImageCnt = data;
+                    if (totalUploadImageCnt > 27) {
+                      document.getElementById("loadMore").setAttribute("style","display: block;");
+                    }
+                });
           }
           else {
             $.post("upload.php" , {indexWord}, function(data) {
               if(data.length == 11) {
                $("#gallery").append('');
                document.getElementById("gallery").innerHTML = '';
-               document.getElementById("loadMore").disabled = true;
+               document.getElementById("loadMore").setAttribute("style", " display: none;");
               }
                 
               else {
                 document.getElementById("gallery").innerHTML = '';
                 var data = JSON.parse(data);
-                document.getElementById("loadMore").disabled = true;
+                document.getElementById("loadMore").setAttribute("style", "display: none;");
                 for(var j = 0 ; j < data.length ; j++) {
                   var insertDiv = "<div id='"+data[j].fileurl+"' style='display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url("+data[j].fileurl+"); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;'></div>";
                   $("#gallery").append(insertDiv);
@@ -812,10 +938,28 @@ $result1 = mysqli_query($conn , $sql1);
           document.getElementById("zipResult").setAttribute("style", "display: block;");
         })
 
-        // when sidenavbar click , process image
+        // when click delete permanantly a 
+        $("#deleteImg").click(()=>{
+          var curId = document.getElementById("curimageurl").value;
+          prediv = null;
+          clickflag = 0;
+          document.getElementById('mySidenav').style.width = 0 + 'px';
+          document.getElementById(curId).remove();
+          $.post("upload.php" , {id: curId , delete: "true"} , function(data) {
 
-        $("#mySidenav").on("click", function(e) {
-          if(e.target.id == "curimage") {
+          });
+          $.post("upload.php", {getRow:"true"}, function(data) {
+                    totalUploadImageCnt = data;
+                    if (totalUploadImageCnt > 27) {
+                      document.getElementById("loadMore").setAttribute("style","display: block;");
+                    }
+                    else {
+                      document.getElementById("loadMore").setAttribute("style", "display: none;");
+                    }
+                });
+        });
+        // when sidenavbar click , process image
+        $("#editImage").on("click", function(e) {
               var modal = document.getElementById("myModal");
               var span = document.getElementsByClassName("close")[0];
 
@@ -836,161 +980,56 @@ $result1 = mysqli_query($conn , $sql1);
               var Image = document.getElementById("curImageObject");
               context.drawImage(Image, 0, 0, 300 , 300); 
               
-              var tools = {
-                //output to <img>  
-                  save: function() { 
-                      var saveDialog = $("<div>").appendTo("body");
-                           
-                      $("<img/>", { 
-                          src: $("#curimageurl").val()
-                      }).appendTo(saveDialog);                             
-                      saveDialog.dialog({ 
-                          resizable: false, 
-                          modal: true, 
-                          title: "Right-click and choose 'Save Image As'", 
-                          width: $("#curimageurl").width + 35 ,
-                      }); 
-                  },
-                  rotate: function(conf) { 
-                      //save current image before rotating 
-                      $("<img/>", { 
-                          src: editor.toDataURL(), 
-                          load: function() { 
-                              //rotate canvas 
-                              context.clearRect(0, 0, editor.width, editor.height); 
-                              context.translate(conf.x, conf.y); 
-                              context.rotate(conf.r); 
-                              //redraw saved image 
-                              context.drawImage(this, 0, 0);   
-                          } 
-                      }); 
-                  }, 
-                  rotateL: function() { 
-                      var conf = { 
-                          x: 0, 
-                          y: editor.height, 
-                          r: -90 * Math.PI / 180 
-                      }; 
-                      tools.rotate(conf); 
-                  }, 
-                  rotateR: function() { 
-                      var conf = { 
-                          x: editor.width, 
-                          y: 0, 
-                          r: 90 * Math.PI / 180 
-                      }; 
-                      tools.rotate(conf); 
-                  },
-                  resize: function() { 
-                  //create resizable over canvas 
-                  var coords = $(editor).offset(), 
-                      resizer = $("<div>", { 
-                          id: "resizer"
-                      }).css({ 
-                          position: "absolute", 
-                          left: coords.left, 
-                          top: coords.top, 
-                          width: editor.width - 1, 
-                          height: editor.height - 1 
-                      }).appendTo("body"); 
-                
-                      var resizeWidth = null, 
-                          resizeHeight = null, 
-                          xpos = editor.offsetLeft + 5, 
-                          ypos = editor.offsetTop + 5; 
-                            
-                      resizer.resizable({ 
-                          aspectRatio: true, 
-                          maxWidth: editor.width - 1, 
-                          maxHeight: editor.height - 1, 
-                            
-                          resize: function(e, ui) { 
-                              resizeWidth = Math.round(ui.size.width); 
-                              resizeHeight = Math.round(ui.size.height); 
-                            
-                              //tooltip to show new size 
-                              var string = "New width: " + resizeWidth + "px,<br />new height: " + resizeHeight + "px"; 
-                                
-                              if ($("#tip").length) { 
-                                  $("#tip").html(string); 
-                              } else { 
-                                  var tip = $("<p></p>", { 
-                                      id: "tip", 
-                                      html: string 
-                                  }).css({ 
-                                      left: xpos, 
-                                      top: ypos 
-                                  }).appendTo("body"); 
-                              } 
-                          }, 
-                          stop: function(e, ui) { 
-                            
-                              //confirm resize, then do it 
-                              var confirmDialog = $("<div></div>", { 
-                                  html: "Image will be resized to " + resizeWidth + "px wide, and " + resizeHeight + "px high.<br />Proceed?"
-                              });              
-                                                
-                              //init confirm dialog 
-                              confirmDialog.dialog({ 
-                                  resizable: false, 
-                                  modal: true, 
-                                  title: "Confirm resize?", 
-                                  buttons: { 
-                                      Cancel: function() { 
-                                        
-                                          //tidy up 
-                                          $(this).dialog("close"); 
-                                          resizer.remove(); 
-                                          $("#tip").remove(); 
-                                      }, 
-                                  Yes: function() { 
-                                    
-                                      //tidy up 
-                                      $(this).dialog("close"); 
-                                      resizer.remove(); 
-                                      $("#tip").remove();                          
-                                        
-                                      $("<img/>", { 
-                                          src: editor.toDataURL(), 
-                                          load: function() {                           
-                
-                                              //remove old image 
-                                              context.clearRect(0, 0, editor.width, editor.height); 
-                                                
-                                              //resize canvas 
-                                              editor.width = resizeWidth; 
-                                              editor.height = resizeHeight; 
-                                                
-                                              //redraw saved image 
-                                              context.drawImage(this, 0, 0, resizeWidth, resizeHeight);    
-                                          } 
-                                      }); 
-                                  } 
-                              } 
-                          }); 
-                      } 
-                  }); 
-              },
-                       
-              }
+        });
 
-              $("#toolbar").children().click(function(e) {
-                e.preventDefault();
-                tools[this.id].call(this);
-              })
+        // when click copy url btn
+        $("#copyurlbtn").click(()=>{
+          var copyText = document.getElementById("curimageurl");
+          copyText.select();
+          copyText.setSelectionRange(0, 99999); 
+          navigator.clipboard.writeText(copyText.value);  
+          document.getElementById("mySidenav2").style.width = "300px";
+          setTimeout(function(){
+            document.getElementById("mySidenav2").style.width = "0";
+          },2000);
+        })
+
+        // when change audio type dropdown list
+        $("#typeMediafilter").change((e)=>{
+          document.getElementById('gallery').innerHTML = '';
+          var mediaType = e.target.value;
+          if(mediaType == "All media items") {
+            document.getElementById("loadMore").disabled = false;
+            document.getElementById("loadMore").setAttribute("style", " pointer-events: auto;");
+            $('#loadMore').mouseover(function(){
+                $(this).css({ color: '#777777' , backgroundColor: 'white' , boxShadow: '0px 3px 3px 0px rgba(0, 0, 0, 0.3)'});
+            }, function(){
+                $(this).css({ color: '#777777' , backgroundColor: 'white' , boxShadow: '0px 3px 3px 0px rgba(0, 0, 0, 0.3)' });
+            });
+            $('#loadMore').mouseout(function(){
+                $(this).css({ color: '#aaaaaa' , boxShadow: '0px 3px 3px 0px rgba(0, 0, 0, 0.001)'});
+            }, function(){
+                $(this).css({ color: '#aaaaaa' , boxShadow: '0px 3px 3px 0px rgba(0, 0, 0, 0.01)' });
+            });
           }
           else {
-            return;
+            document.getElementById("loadMore").setAttribute("style","pointer-events: none;");
           }
+          $.post("upload.php" , {mediaType} , function(data) {
+            
+            if(data.indexOf("0 result") != -1) {
+              
+            }
+            else {
+              var data = JSON.parse(data);
+              for(var i = 0 ; i < data.length ; i++) {
+                $("#gallery").append("<div id='"+data[i].fileurl+"' style='display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(" + data[i].fileurl + "); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;'></div>");
+
+              }
+            }
+          });
         })
       });
-
-    (function($){        
-    //get canvas and context 
-          
-                 
-       //more code to follow here... 
-    })(jQuery);
 
     </script>
   </body>
