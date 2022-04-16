@@ -48,15 +48,10 @@ $result1 = mysqli_query($conn , $sql1);
     <link rel="stylesheet" type="text/css" href="./assets/jquery-ui-1.8.7.custom.css" /> 
     <link rel="stylesheet" type="text/css" href="./assets/custom.css" />
 
-    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-    <script>
-      (adsbygoogle = window.adsbygoogle || []).push({
-        google_ad_client: "ca-pub-6883622550208397",
-        enable_page_level_ads: true
-      });
-    </script>
-      <script src="https://tutsplus.s3.amazonaws.com/tutspremium/web-development/133_canvasEditor/demo/jquery-1.4.4.min.js"></script>
+
+    <script src="https://tutsplus.s3.amazonaws.com/tutspremium/web-development/133_canvasEditor/demo/jquery-1.4.4.min.js"></script>
       <script src="https://tutsplus.s3.amazonaws.com/tutspremium/web-development/133_canvasEditor/demo/jquery-ui-1.8.7.custom.min.js"></script>
+
     <style>
       .PHPGangMessage a,
       .subbase a {
@@ -180,9 +175,6 @@ $result1 = mysqli_query($conn , $sql1);
               </div>
             </div>
 
-
-
-
             <div class="searchinputDiv">
               <div class="searchFloatDiv">
                 <label class="searchLabel">Search </label>
@@ -258,7 +250,7 @@ $result1 = mysqli_query($conn , $sql1);
               </div>
             </div>
             <div class="linkSidebar">
-              <a class="sidebarLink">View attachment page</a> | <a class="sidebarLink" id="editImage">Edit more details</a> | <a class="sidebarLink redLink" id="deleteImg">Delete permanently</a>
+              <a class="sidebarLink" id="editImage">Edit more details</a> | <a class="sidebarLink redLink" id="deleteImg">Delete permanently</a>
             </div>
           </div>
           <div id="myModal" class="modal">
@@ -414,6 +406,7 @@ $result1 = mysqli_query($conn , $sql1);
                $("#curimageUrl").val(response.fileurl);
                $("#altText").val(response.alttext);
                if(response.title == '') {
+                $("#imgTitle").val('');
                 // $("#imgTitle").val(response.filename.slice(0,response.filename.lastIndexOf(".")));
                }
                else {
@@ -526,7 +519,7 @@ $result1 = mysqli_query($conn , $sql1);
         }
         // when click data range picker
         $("#dateFrom").change(()=>{
-          if(dateFromflag == 0 || dateToflag == 0) {
+          if(dateToflag == 0) {
             dateFromflag = 1;
             DateRange(0,"from");
           }
@@ -536,7 +529,7 @@ $result1 = mysqli_query($conn , $sql1);
           }
         });
         $("#dateTo").change(()=>{
-          if(dateFromflag == 0 || dateToflag == 0) {
+          if(dateFromflag == 0) {
             DateRange(0,"to");
             dateToflag = 1;
           }
@@ -590,47 +583,46 @@ $result1 = mysqli_query($conn , $sql1);
               clearInterval(myInterval1);
             } else {
               var embed = result[indexembed];
-              if(embed.slice(0, 8) != "<iframe " || embed.slice(-9) != "</iframe>") {
-                alert("Failed spell!");
-                return;
-              }
-              var draw = embed.split("src=");
-              var draw1 = draw[1].split(">");
-              var embedsource = draw1[0].slice(1 , draw1[0].length -1);
-              var embedresult , embedGlobal , embedGlobal1;
-              $.ajax({
-                      url:"upload.php",
-                      method:"POST",
-                      data:{image_url:embedsource},
-                      dataType:"JSON",
-                      success:function(data)
-                      {
-                        embedresult = '<div id="embedremove" style="background-image:url(' + data.image + '); opacity: 0.7; background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="./assets/load.gif" /><button style="position: absolute; background-image: url(./assets/cancel.png); color: white; background-position: center; background-size: cover;  background-repeat: no-repeat; width: 30px; height:30px; font-size: 8px; top: 33px; left: 33px;"></button></div>';
-                        embedGlobal = '<div id="'+data.image+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data.image + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>';
-                        embedGlobal1 = '<div style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data.image + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"><img src="./assets/tick.png" style="position:absolute; width:30px ; height: 30px; top: 70px; left: 70px; " /></div>';
-                        $("#embedResult").append(embedresult);
-                        
-                        setTimeout(function(){
+              if(embed.slice(0, 8) == "<iframe " || embed.slice(-9) == "</iframe>") {
+                
+                var draw = embed.split("src=");
+                var draw1 = draw[1].split(">");
+                var embedsource = draw1[0].slice(1 , draw1[0].length -1);
+                var embedresult , embedGlobal , embedGlobal1;
+                $.ajax({
+                        url:"upload.php",
+                        method:"POST",
+                        data:{image_url:embedsource},
+                        dataType:"JSON",
+                        success:function(data)
+                        {
+                          embedresult = '<div id="embedremove" style="background-image:url(' + data.image + '); opacity: 0.7; background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="./assets/load.gif" /><button style="position: absolute; background-image: url(./assets/cancel.png); color: white; background-position: center; background-size: cover;  background-repeat: no-repeat; width: 30px; height:30px; font-size: 8px; top: 33px; left: 33px;"></button></div>';
+                          embedGlobal = '<div id="'+data.image+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data.image + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>';
+                          embedGlobal1 = '<div style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data.image + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"><img src="./assets/tick.png" style="position:absolute; width:30px ; height: 30px; top: 70px; left: 70px; " /></div>';
+                          $("#embedResult").append(embedresult);
+                          
+                          setTimeout(function(){
 
-                          document.getElementById("embedremove").remove();
-                          $("#gallery").append(embedGlobal);
-                          $("#embedResult").append(embedGlobal1);
-                          indexembed++;
-                        },1000); 
+                            document.getElementById("embedremove").remove();
+                            $("#gallery").append(embedGlobal);
+                            $("#embedResult").append(embedGlobal1);
+                            indexembed++;
+                          },1000); 
 
-                      },
-                      error: function(err) {
-                         var fromurlresult = '<div id="fromurlembed" style=" opacity: 0.7; background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="./assets/load.gif" /><button style="position: absolute; background-image: url(./assets/cancel.png); color: white; background-position: center; background-size: cover;  background-repeat: no-repeat; width: 30px; height:30px; font-size: 8px; top: 33px; left: 33px;"></button></div>';
-                          $('#embedResult').append(fromurlresult);
-                        setTimeout(function(){
-                           document.getElementById("fromurlembed").remove();
-                          $("#embedResult").append('<div style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; padding-top: 40px; padding-left: 30px; height: 100px;">Failed</div>');
-                          indexembed++;
-                        },1000);
-                      }
-                    })
+                        },
+                        error: function(err) {
+                           var fromurlresult = '<div id="fromurlembed" style=" opacity: 0.7; background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="./assets/load.gif" /></div>';
+                            $('#embedResult').append(fromurlresult);
+                          setTimeout(function(){
+                             document.getElementById("fromurlembed").remove();
+                            $("#embedResult").append('<div style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; padding-top: 40px; padding-left: 30px; height: 100px;">Failed</div>');
+                            indexembed++;
+                          },1000);
+                        }
+                      });
                   }
-              }, 2000);
+                    }
+                }, 2000);
         });
 
         // Upload from multiple Url in Second tab named "Insert from URL"
@@ -686,7 +678,7 @@ $result1 = mysqli_query($conn , $sql1);
                     },1000);
                   },
                   error: function(err) {
-                     var fromurlresult = '<div id="fromurlembed" style=" opacity: 0.7; background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="./assets/load.gif" /><button style="position: absolute; background-image: url(./assets/cancel.png); color: white; background-position: center; background-size: cover;  background-repeat: no-repeat; width: 30px; height:30px; font-size: 8px; top: 33px; left: 33px;"></button></div>';
+                     var fromurlresult = '<div id="fromurlembed" style=" opacity: 0.7; background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="./assets/load.gif" /></div>';
                       $('#imageurlPreview').append(fromurlresult);
                     setTimeout(function(){
                        document.getElementById("fromurlembed").remove();
@@ -697,7 +689,7 @@ $result1 = mysqli_query($conn , $sql1);
                  })
                 }
               }
-            },2000);  
+            },3000);  
         })
 
         var zipRealDiv = [];
@@ -998,23 +990,16 @@ $result1 = mysqli_query($conn , $sql1);
         $("#typeMediafilter").change((e)=>{
           document.getElementById('gallery').innerHTML = '';
           var mediaType = e.target.value;
-          if(mediaType == "All media items") {
-            document.getElementById("loadMore").disabled = false;
-            document.getElementById("loadMore").setAttribute("style", " pointer-events: auto;");
-            $('#loadMore').mouseover(function(){
-                $(this).css({ color: '#777777' , backgroundColor: 'white' , boxShadow: '0px 3px 3px 0px rgba(0, 0, 0, 0.3)'});
-            }, function(){
-                $(this).css({ color: '#777777' , backgroundColor: 'white' , boxShadow: '0px 3px 3px 0px rgba(0, 0, 0, 0.3)' });
-            });
-            $('#loadMore').mouseout(function(){
-                $(this).css({ color: '#aaaaaa' , boxShadow: '0px 3px 3px 0px rgba(0, 0, 0, 0.001)'});
-            }, function(){
-                $(this).css({ color: '#aaaaaa' , boxShadow: '0px 3px 3px 0px rgba(0, 0, 0, 0.01)' });
-            });
-          }
-          else {
-            document.getElementById("loadMore").setAttribute("style","pointer-events: none;");
-          }
+
+             $.post("upload.php", {getRow:"true"}, function(data) {
+                    totalUploadImageCnt = data;
+                    if (totalUploadImageCnt > 27) {
+                      document.getElementById("loadMore").setAttribute("style","display: block;");
+                    }
+                    else
+                      document.getElementById("loadMore").setAttribute("style" , "display: none; ");
+                });
+          
           $.post("upload.php" , {mediaType} , function(data) {
             
             if(data.indexOf("0 result") != -1) {
@@ -1026,10 +1011,19 @@ $result1 = mysqli_query($conn , $sql1);
                 $("#gallery").append("<div id='"+data[i].fileurl+"' style='display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(" + data[i].fileurl + "); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;'></div>");
 
               }
+                $.post("upload.php", {getRow:"true"}, function(data) {
+                    totalUploadImageCnt = data;
+                    if (totalUploadImageCnt > 27) {
+                      document.getElementById("loadMore").setAttribute("style","display: block;");
+                    }
+                    else
+                      document.getElementById("loadMore").setAttribute("style" , "display: none; ");
+                });
             }
           });
         })
       });
+    
 
     </script>
   </body>

@@ -309,6 +309,7 @@ strong:hover {
 .linkSidebar {
   width: 400px;
   margin-left: 20px;
+  padding-left: 120px;
 }
 .sidebarLink {
   color: #4d4dff !important;
