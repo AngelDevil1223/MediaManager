@@ -165,10 +165,14 @@ h5 {
   margin-left: 50px;
   cursor: pointer;
 }
-.gallery {
-  width: 1000px;
+.galleryParent {
   height: 320px;
   overflow: hidden;
+}
+.gallery {
+  width: 1000px;
+  display: flex;
+  flex-wrap: wrap;
 }
 .sidenav {
   height: 100%;
@@ -602,6 +606,8 @@ strong:hover {
   border-radius: 5px 5px 0px 0px;
 }
 .modal-body {
+  display: flex;
+  flex-direction: row;
   padding: 2px 16px; 
   background-color: white;
   height: 500px;
@@ -738,4 +744,64 @@ strong:hover {
 }
 #imguploadbtn{
   border: 1px solid black;
+}
+
+#toolbar { 
+  display:block; 
+  margin:20px 0 0; 
+}
+.editbtns { 
+  margin-right:10px; 
+  color: #eeeeee; 
+  padding: 2px 4px 2px 4px ;
+  border-radius: 3px;
+  cursor: pointer;
+  background-color: #5bc0de;
+  margin-bottom: 10px;
+}
+.editbtns:hover {
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
+#imageEditor {
+  width: 80%;
+  display: inline-block;
+}
+#editor {
+  background-position: center;  
+  background-repeat: no-repeat; 
+  background-size: cover; 
+  position: relative;
+}
+
+#imageInputer {
+  width: 20%;
+  display: inline-block;
+}
+.imageInputer_sec {
+  margin-top: 20px;
+}
+.img_resize_input {
+  border: 1px solid #eeeeee;
+  font-size: 18px;
+  padding: 2px 5px 2px 10px;
+  border-radius: 3px;
+  width: 100px;
+}
+.width_label {
+  margin-right: 10px;
+}
+.height_label {
+  margin-right: 5px;
+}
+.resize_btn {
+  border: 1px solid #dddddd;
+  border-radius: 3px;
+  padding: 4px 10px 4px 10px;
+  cursor: pointer;
+  margin-left: 85px;
+}
+.resize_btn:hover {
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.2);
 }

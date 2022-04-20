@@ -43,15 +43,15 @@ $result1 = mysqli_query($conn , $sql1);
 
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css" />
     <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" />
-
-    <link rel="stylesheet" type="text/css" href="./assets/image-editor.css" />
     <link rel="stylesheet" type="text/css" href="./assets/jquery-ui-1.8.7.custom.css" /> 
     <link rel="stylesheet" type="text/css" href="./assets/custom.css" />
 
 
     <script src="https://tutsplus.s3.amazonaws.com/tutspremium/web-development/133_canvasEditor/demo/jquery-1.4.4.min.js"></script>
       <script src="https://tutsplus.s3.amazonaws.com/tutspremium/web-development/133_canvasEditor/demo/jquery-ui-1.8.7.custom.min.js"></script>
-
+    <script src="http://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
+    <script src=" https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.js" type="text/javascript"></script>
+    
     <style>
       .PHPGangMessage a,
       .subbase a {
@@ -182,11 +182,22 @@ $result1 = mysqli_query($conn , $sql1);
               </div>
             </div>
           </div>
-          <div class="gallery" id="gallery">
-            <?php
-                while($data = mysqli_fetch_assoc($result)) {
-               echo "<div id='".$data['fileurl']."' style='display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(".$data['fileurl']."); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;'></div>" ;
-             } ?>
+          <div class="galleryParent" id="galleryParent">  
+            <div class="gallery" id="gallery">
+              <?php
+                  while($data = mysqli_fetch_assoc($result)) {
+                    $comp = substr($data['fileurl'], -3);
+                    if ($comp == "jpg" || $comp == "peg" || $comp == "png") {
+                      echo "<div id='".$data['fileurl']."' style=' margin-right: 10px; margin-bottom: 10px;  background-image: url(".$data['fileurl']."); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;'></div>" ;
+                    }
+                    else if($comp == "mp4" || $comp == "avi") {
+                      echo '<video id="'.$data['fileurl'].'" src="'.$data['fileurl'].'" controls style="box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); width:100px ; height: 100px; margin-right: 10px; margin-bottom: 10px; "><source type="video/mp4"></video>';
+                    }
+                  } 
+              ?> 
+                    
+                     
+            </div>
           </div>
           <button class="loadMore" id="loadMore">Load More</button>
           <div id="mySidenav" class="sidenav">
@@ -259,19 +270,30 @@ $result1 = mysqli_query($conn , $sql1);
                 <span class="close">&times;</span>
                 <h2 class="editImagetitle"> Edit Image </h2>
               </div>
-              <div class="modal-body">
+              <div class="modal-body" id="modalBody">
                 <div id="imageEditor">
-                  <section id="editorContainer">
-                    <canvas id="editor" width="300px" height="300px">
-                      
-                    </canvas>
-                  </section>
+                 
                   <section id="toolbar">
-                    <a href="#" id="save" title="Save">Save</a>
-                    <a href="#" id="rotateL" title="Rotate Left">Rotate Left</a>
-                    <a href="#" id="rotateR" title="Rotate Right">Rotate Right</a>
-                    <a href="#" id="resize" title="Resize">Resize</a>
+                    <button class="editbtns" id="editSave" title="Save">Save</button>
+                    <button class="editbtns" id="rotateL" title="Rotate Left">Rotate Left</button>
+                    <button class="editbtns" id="rotateR" title="Rotate Right">Rotate Right</button>
                   </section>
+                   <section id="editorContainer">
+                    <div id="editor">
+                      
+                    </div>
+                  </section>
+                </div>
+                <div id="imageInputer">
+                  <div class="imageInputer_sec">
+                    <label class="width_label">Width:</label><input class="img_resize_input" id="img_resize_width" />
+                  </div>
+                  <div class="imageInputer_sec">
+                    <label class="height_label">Height:</label><input class="img_resize_input" id="img_resize_height" />
+                  </div>
+                  <div class="imageInputer_sec">
+                    <button class="resize_btn editbtns" id="img_resize_btn">Resize</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -296,7 +318,12 @@ $result1 = mysqli_query($conn , $sql1);
       var totalUploadImageCnt = 0;
       var dateFromflag = 0;
       var dateToflag = 0;
-
+      var curimagewidth = 0;
+      var curimageheight = 0;
+      var rotateLeftflag = 0,
+          rotateRightflag = 0;
+      var imageWidth = 0,
+          imageHeight = 0;
       $(document).ready(function() {
 
         $.post("upload.php" , {initial: "true"},function(data) {
@@ -344,17 +371,25 @@ $result1 = mysqli_query($conn , $sql1);
           $.post('upload.php' , {page: currentpageSize},
             function(data) {
               var data = JSON.parse(data);
+              var loadmoreDiv = 0;
               for(var j = 0 ; j < data.length ; j ++) {
-              var loadmoreDiv = '<div id="'+data[j].fileurl+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data[j].fileurl + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>';
-              $("#gallery").append(loadmoreDiv);
-              $("#gallery").css({"overflow":"auto" , "width":"1020px"});
+                if(data[j].fileurl.slice(-3) == "jpg" || data[j].fileurl.slice(-3) == "png" || data[j].fileurl.slice(-3) == "peg") {
+                    loadmoreDiv = '<div id="'+data[j].fileurl+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data[j].fileurl + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>';
+                }
+                else if(data[j].fileurl.slice(-3) == "mp4" || data[j].fileurl.slice(-3) == "avi") {
+                    loadmoreDiv = '<video id="'+data[j].fileurl+'" src="'+data[j].fileurl+'" controls style="box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); margin-right: 10px; margin-bottom: 10px;  width:100px ; height: 100px; "></button><source type="video/mp4"></video>';
+                }
+                $("#gallery").append(loadmoreDiv);
+               
             }
+            $("#galleryParent").css({"overflow":"auto" , "width":"1020px"});
           });
         });
     
 
         $("#gallery").on('click', function(e) {
-   
+            
+            console.log(e.target.id);
             if(e.target.id == "gallery")
               return;
             if(clickflag == 0) {
@@ -390,7 +425,11 @@ $result1 = mysqli_query($conn , $sql1);
                 $("#curimagetype").val("File / " + exp);
                $("#curimagesize").val(response.filesize);
                var dimension = response.dimension.split("-");
+                curimagewidth = Number(dimension[0]);
+               curimageheight = Number(dimension[1]);
                dimension = dimension[0] + " by " + dimension[1] + " pixels";
+
+              
                $("#curimagedimension").val(dimension);
                $("#curimageurl").val(response.fileurl);
               
@@ -463,12 +502,21 @@ $result1 = mysqli_query($conn , $sql1);
                 totallegnth = data.length;
                 // data = data.slice(2,data.lastIndexOf(']')-1);
                 for(var j = 0 ; j < data.length - 1 ; j++) {
-                  url = data[j];
-                  var embed = '<div id="data'+j+'" style="background-image:url(uploads/' + data[j] + '); opacity: 0.7; background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="./assets/load.gif" /><button style="position: absolute; background-image: url(./assets/cancel.png); color: white; background-position: center; background-size: cover;  background-repeat: no-repeat; width: 30px; height:30px; font-size: 8px; top: 33px; left: 33px;"></button></div>';
                   var uploadedurl = "http://localhost/uploads/" + data[j];
-                  $("#gallery").append('<div id="'+uploadedurl+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(uploads/' + data[j] + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>');
-                  // $("#gallery").append('<h2>asdf</h2>');
-                  embed1[j] = '<div style="background-image:url(uploads/' + data[j] + '); opacity: 1; background-position: center;  background-repeat: no-repeat; background-size: cover; position: relative; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.4);" class="thumbnail"><img style="position: absolute; width: 30px; height: 30px; top: 70px; left: 70px;" src="./assets/tick.png" /></div>';
+                  url = data[j];
+                  var embed = '';
+                  if(uploadedurl.slice(-3) == "mp4" || uploadedurl.slice(-3) == "avi") {
+                    embed = '<video id="data'+j+'" src="'+uploadedurl+'" controls style="box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); width:100px ; height: 100px; "><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="./assets/load.gif" /><button style="position: absolute; background-image: url(./assets/cancel.png); color: white; background-position: center; background-size: cover;  background-repeat: no-repeat; width: 30px; height:30px; font-size: 8px; top: 33px; left: 33px;"></button><source type="video/mp4"></video>';
+                    embed1[j] = '<video id="data'+j+'" src="'+uploadedurl+'" controls style="box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); width:100px ; height: 100px; "> <img style="position: absolute; width: 30px; height: 30px; top: 70px; left: 70px;" src="./assets/tick.png" /><source type="video/mp4"></video>';
+                    $("#gallery").append('<video id="'+uploadedurl+'" src="'+uploadedurl+'" controls style="box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); width:100px ; height: 100px; "></button><source type="video/mp4"></video>');
+                  }
+                  
+                  else if(uploadedurl.slice(-3) == "jpg" || uploadedurl.slice(-3) == "png") {
+                    embed = '<div id="data'+j+'" style="background-image:url(uploads/' + data[j] + '); opacity: 0.7; background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative;" class="thumbnail"><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="./assets/load.gif" /><button style="position: absolute; background-image: url(./assets/cancel.png); color: white; background-position: center; background-size: cover;  background-repeat: no-repeat; width: 30px; height:30px; font-size: 8px; top: 33px; left: 33px;"></button></div>';
+                    
+                    $("#gallery").append('<div id="'+uploadedurl+'" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(uploads/' + data[j] + '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>');
+                    embed1[j] = '<div style="background-image:url(uploads/' + data[j] + '); opacity: 1; background-position: center;  background-repeat: no-repeat; background-size: cover; position: relative; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.4);" class="thumbnail"><img style="position: absolute; width: 30px; height: 30px; top: 70px; left: 70px;" src="./assets/tick.png" /></div>';
+                  }
                   $("#showThumb").append(embed);
                   setTimeout(function(){
                     fix()
@@ -730,13 +778,23 @@ $result1 = mysqli_query($conn , $sql1);
                 $("#fakeInput").val('');
                 var data = JSON.parse(data);
                 zipRealCnt = data.length;
+                var zipDiv = "";
                 for(var j = 0 ; j < data.length ; j ++) {
-                  var zipDiv = '<div style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data[j]+ '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"><img style="position: absolute; width: 30px; height: 30px; top: 33px; left: 33px;" src="./assets/load.gif" /></div>';
+                  console.log(data[j]);
+                  if (data[j].slice(-3) == "jpg" || data[j].slice(-3) == "png" || data[j].slice(-3) == "peg") {
+                    zipDiv = '<div style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data[j]+ '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"><img style="position: absolute; width: 30px; height: 30px; top: 33px; left: 33px;" src="./assets/load.gif" /></div>';
 
-                  zipRealDiv[j] = '<div style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data[j]+ '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"><img style="position: absolute; width: 30px; height: 30px; top: 70px; left: 70px;" src="./assets/tick.png" /></div>'
+                    zipRealDiv[j] = '<div style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data[j]+ '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"><img style="position: absolute; width: 30px; height: 30px; top: 70px; left: 70px;" src="./assets/tick.png" /></div>';
 
-                  galleryRealDiv[j] = '<div id="' + data[j] + '" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data[j]+ '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>' 
+                    galleryRealDiv[j] = '<div id="' + data[j] + '" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url(' + data[j]+ '); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;"></div>';
+                  }
+                  else if(data[j].slice(-3) == "avi" || data[j].slice(-3) == "mp4") {
+                    zipDiv = '<video src="'+data[j]+'" controls style="box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); width:100px ; height: 100px; margin-right: 10px;  "><img style="position: absolute; width: 50px; height: 50px; top: 25px; left: 25px;" src="./assets/load.gif" /><button style="position: absolute; background-image: url(./assets/cancel.png); color: white; background-position: center; background-size: cover;  background-repeat: no-repeat; width: 30px; height:30px; font-size: 8px; top: 33px; left: 33px;"></button><source type="video/mp4"></video>';
 
+                    zipRealDiv[j] = '<video src="'+data[j]+'" controls style="box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); width:100px ; height: 100px; "> <img style="position: absolute; width: 30px; height: 30px; top: 70px; left: 70px;" src="./assets/tick.png" /><source type="video/mp4"></video>';
+
+                    galleryRealDiv[j] = '<video id="'+data[j]+'" src="'+data[j]+'" controls style="box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); width:100px ; height: 100px; "></button><source type="video/mp4"></video>';
+                  }
                   $("#zipResult").append(zipDiv);
                 }
                 setTimeout(function(){
@@ -835,7 +893,7 @@ $result1 = mysqli_query($conn , $sql1);
                     var insertDiv = "<div id='"+data[j].fileurl+"' style='display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url("+data[j].fileurl+"); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;'></div>";
                     $("#gallery").append(insertDiv);
                   }
-                  document.getElementById("gallery").style.overflow = "hidden";
+                  document.getElementById("galleryParent").style.overflow = "hidden";
                 })
                 if (totalUploadImageCnt > 27) {
                   document.getElementById("loadMore").setAttribute("style","display: block;");
@@ -884,7 +942,7 @@ $result1 = mysqli_query($conn , $sql1);
                   var insertDiv = "<div id='"+data[j].fileurl+"' style='display: inline-block; margin-right: 10px; margin-bottom: 10px;  background-image: url("+data[j].fileurl+"); background-position: center;  background-repeat: no-repeat; box-shadow:0px 6px 6px 0px rgba(0, 0, 0, 0.3); background-size: cover; position: relative; width:100px ; height: 100px;'></div>";
                   $("#gallery").append(insertDiv);
                 }
-                document.getElementById("gallery").style.overflow = "hidden";
+                document.getElementById("galleryParent").style.overflow = "hidden";
             })
             $.post("upload.php", {getRow:"true"}, function(data) {
                     totalUploadImageCnt = data;
@@ -966,11 +1024,19 @@ $result1 = mysqli_query($conn , $sql1);
                   modal.style.display = "none";
                 }
               }
+              var Image = document.getElementById("curimageurl").value;
+              var editor = document.getElementById("editor");
+              var modalBody = document.getElementById("modalBody");
+              if(curimagewidth > curimageheight)
+                modalBody.style.height = curimagewidth + 200 + 'px';
+              else
+                modalBody.style.height = curimageheight + 200 + 'px';
+              editor.style.width = curimagewidth + 'px';
+              editor.style.height = curimageheight + 'px';
 
-              var editor = document.getElementById("editor"); 
-              var context = editor.getContext("2d");       
-              var Image = document.getElementById("curImageObject");
-              context.drawImage(Image, 0, 0, 300 , 300); 
+              editor.style.top = 0 + 'px';
+              editor.style.left = 0 + 'px';
+              editor.style.backgroundImage = "url('"+Image+"')";
               
         });
 
@@ -1021,7 +1087,82 @@ $result1 = mysqli_query($conn , $sql1);
                 });
             }
           });
-        })
+        });
+
+
+        // image resize btn click
+
+        $("#img_resize_btn").click(() => {
+          var imageWidth = document.getElementById("img_resize_width").value,
+              imageHeight = document.getElementById("img_resize_height").value;
+          document.getElementById("editor").style.width = imageWidth + 'px';
+          document.getElementById("editor").style.height = imageHeight + 'px';
+        });
+
+        // image rotate Left click
+        $("#rotateL").click(()=>{
+          rotateLeftflag += 1;
+          var value = rotateLeftflag * 90;
+          var delta = 0;
+          var image = document.getElementById("editor");
+          var curwidth = parseInt(image.style.width);
+          var curheight = parseInt(image.style.height);
+          console.log("curwidth  " + curwidth + "  curheight  " + curheight);
+          image.style.transform = 'rotate(-' + value + 'deg)';
+          if(curwidth > curheight) {
+            delta = (curwidth - curheight) / 2;
+            image.style.top = delta + 'px';
+            image.style.left = 0;
+          }
+          else {
+            delta = (curheight - curwidth) / 2;
+            image.style.top = 0 + 'px';
+            image.style.left = delta + 'px';
+          }
+
+        });
+
+        // when image rotate right click
+        $("#rotateR").click(()=>{
+          rotateRightflag += 1;
+          var value = rotateRightflag * 90;
+          var delta = 0;
+          var image = document.getElementById("editor");
+          var curwidth = parseInt(image.style.width);
+          var curheight = parseInt(image.style.height);
+          image.style.transform = 'rotate(' + value + 'deg)';
+          if(curwidth > curheight) {
+            delta = (curwidth - curheight) / 2;
+            image.style.top = delta + 'px';
+            image.style.left = 0;
+          }
+          else {
+            delta = (curheight - curwidth) / 2;
+            image.style.top = 0 + 'px';
+            image.style.left = delta + 'px';
+          }
+        });
+
+        // when click image edit save btn
+        $("#editSave").click(()=> {
+          html2canvas(document.getElementById("editor")).then(function (canvas) {      
+            var anchorTag = document.createElement("a");
+            document.body.appendChild(anchorTag);
+            var originname = document.getElementById("curimagename").value;
+            originname = originname.slice(0, originname.indexOf("."));
+            var addnum = parseInt(Math.random() * (30000 - 10000) + 10000);
+            originname = originname + addnum + '.jpg';
+            anchorTag.download = originname;
+            anchorTag.href = canvas.toDataURL();
+            anchorTag.target = '_blank';
+            anchorTag.click();
+          });
+          setTimeout(function() {
+            document.getElementById("editor").style.top = 0 + 'px';
+            document.getElementById("editor").style.left = 0 + 'px';
+            window.location.href = "/";
+          }, 2000);
+        });
       });
     
 

@@ -62,22 +62,27 @@ include 'config.php';
 				foreach($files as $file){
 					$tmp_ext = explode(".", $file);
 					$file_ext = end($tmp_ext);
-					$allowed_ext = array('jpg', 'png', 'jpeg', 'gif');
+					$allowed_ext = array('jpg', 'png', 'jpeg', 'gif', 'avi', 'mp4');
 					if(in_array($file_ext, $allowed_ext)){
 						$new_file = $tmp_ext[0].".".$file_ext;
-							$echodata[$i] = 'http://localhost/' . $tempdir . '/' . $new_file;
+						$echodata[$i] = 'http://localhost/' . $tempdir . '/' . $new_file;
 
-							$filename = $new_file;
-							$updatedname = $filename;
-							$fileurl = $echodata[$i];
-							$cur_time = date('d-m-y h:i:s');
+						$filename = $new_file;
+						$updatedname = $filename;
+						$fileurl = $echodata[$i];
+						$cur_time = date('d-m-y h:i:s');
 
-							$filesize = filesize($tempdir . '/' . $new_file);
+						$filesize = filesize($tempdir . '/' . $new_file);
 						$filesize = round($filesize / 1024 , 2) . " KB";
-						$image_info = getimagesize($tempdir . '/' . $new_file);
-						$image_width = $image_info[0];
-						$image_height = $image_info[1];
-						$dimension = $image_width. "-" . $image_height;
+						if($file_ext == "mp4" || $file_ext == "avi") {
+							$dimension = "None";
+						}
+						else if($file_ext == "jpg" || $file_ext == "png" || $file_ext == "jpeg" || $file_ext =="gif") {
+							$image_info = getimagesize($tempdir . '/' . $new_file);
+							$image_width = $image_info[0];
+							$image_height = $image_info[1];
+							$dimension = $image_width. "-" . $image_height;
+						}
 						$visible = 0;
 						$sql = "INSERT INTO uploads (filename, updatedname, fileurl, dimension , filesize , uploadtime , alttext , caption , description , title , visible) VALUES ('".$filename."', '".$updatedname."', '".$fileurl."', '".$dimension."' , '".$filesize."', '".$cur_time."', '' , '' , '' , '' , '".$visible."')";
 							$result = mysqli_query($conn , $sql);
