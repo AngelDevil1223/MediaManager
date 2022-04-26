@@ -364,7 +364,7 @@ strong:hover {
 }
 #showThumb {
   width: 1000px !important;
-  height: 210px;
+  height: 220px;
   overflow: auto;
 }
 .loadMore {
@@ -695,7 +695,7 @@ strong:hover {
   margin-top: 30px;
   margin-left: 20px;
   border: 1px solid #cccccc;
-  color: #aaaaaa;
+  color: #555555;
   padding-top: 15px;
   padding-left: 10px;
   border-radius: 4px;

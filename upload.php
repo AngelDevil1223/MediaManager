@@ -167,6 +167,10 @@ include 'config.php';
 		$imgCaption = $_POST['imgCaption'];
 		$imgDes = $_POST['imgDes'];
 		$imgTag = $_POST['imgTag'];
+		$tempdir = '';
+		$path = 'uploads/categories/';
+		$tempdir = $path . $altText;
+		
 		if($imgTag != '') {
 			$string = $imgTag;
 			$string = str_replace(' ' , '', $string);
@@ -186,6 +190,21 @@ include 'config.php';
 
 			}
 		}
+		$sql = "SELECT * FROM folder WHERE folder_name = '".$altText."'";
+		$result = mysqli_query($conn, $sql);
+		
+		if(mysqli_num_rows($result) > 0) {
+
+		}
+		else {
+			$sql1 = "INSERT INTO folder (folder_name) VALUES ('".$altText."')";
+			$result1 = mysqli_query($conn , $sql1);
+			mkdir($tempdir);
+		}
+
+		$filename = substr($url,strripos($url,"/")+1);
+		copy($url, $tempdir.'/'.$filename);
+
 		$sql = "UPDATE uploads SET alttext='".$altText."' , caption='".$imgCaption."' , description='".$imgDes."', title='".$imgTitle."' , cate_name = '".$imgTag."' WHERE fileurl = '".$url."'";
 		$result = mysqli_query($conn , $sql);
 
