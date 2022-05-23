@@ -7,7 +7,7 @@
 
   $sql1 = "SELECT * FROM categories";
   $result1 = mysqli_query($conn , $sql1);
-
+  $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 ?>
 <html lang="en-US" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
   <head>
@@ -502,7 +502,8 @@
                 totallegnth = data.length;
                 // data = data.slice(2,data.lastIndexOf(']')-1);
                 for(var j = 0 ; j < data.length - 1 ; j++) {
-                  var uploadedurl = "http://localhost/uploads/" + data[j];
+                  //var uploadedurl = "http://localhost/uploads/" + data[j];
+                  var uploadedurl = "<?php echo $actual_link; ?>uploads/" + data[j];
                   url = data[j];
                   var embed = '';
                   if(uploadedurl.slice(-3) == "mp4" || uploadedurl.slice(-3) == "avi") {
