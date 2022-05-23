@@ -1,14 +1,16 @@
 <?php
 
 include 'config.php';
-
+$actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+$actual_link = str_replace("upload.php","",$actual_link);
 	// Drag and drop file upload parts
 	if (isset($_FILES['file']['name'][0])) {
 		$imageData = '';
 		$flag = 0;
 	    foreach ($_FILES['file']['name'] as $keys => $values) {
 	        $fileName = uniqid() . '_' . $_FILES['file']['name'][$keys];
-	        $fileurl = "http://localhost/uploads/".$fileName;
+	        //$fileurl = "http://localhost/uploads/".$fileName;
+		$fileurl = $actual_link . "uploads/" . $fileName;
 	        if (move_uploaded_file($_FILES['file']['tmp_name'][$keys], 'uploads/' . $fileName)) {
 	        	$realname = $_FILES['file']['name'][$keys];
 		        $filesize = $_FILES['file']['size'][$keys];
@@ -65,8 +67,8 @@ include 'config.php';
 					$allowed_ext = array('jpg', 'png', 'jpeg', 'gif', 'avi', 'mp4');
 					if(in_array($file_ext, $allowed_ext)){
 						$new_file = $tmp_ext[0].".".$file_ext;
-						$echodata[$i] = 'http://localhost/' . $tempdir . '/' . $new_file;
-
+						//$echodata[$i] = 'http://localhost/' . $tempdir . '/' . $new_file;
+						$echodata[$i] = $actual_link . $tempdir . '/' . $new_file;
 						$filename = $new_file;
 						$updatedname = $filename;
 						$fileurl = $echodata[$i];
@@ -116,7 +118,8 @@ include 'config.php';
 		    $uploadedname = rand(). "." .$extension; 
 		    $new_image_path = "uploads/" . $uploadedname;
 		    file_put_contents($new_image_path, $image_data);
-		    $fileurl = "http://localhost/uploads/".$uploadedname; // data to insert.
+		    //$fileurl = "http://localhost/uploads/".$uploadedname; // data to insert.
+		    $fileurl = $actual_link . "uploads/".$uploadedname;
 		    $realname = $image_name;  // data to insert
 		    // $filesize = $image_data;
 		    // 
